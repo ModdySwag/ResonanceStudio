@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="forge">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Help — Resonance Studio (Gnaural Web)</title>
+<meta name="description" content="The full manual for Resonance Studio: what binaural, monaural and isochronic tones are, how the studio is built, what the Gateway programme focus levels actually are, how to make your own sessions, and the .gnaural file format.">
+<link rel="stylesheet" href="../site.css?v=82x">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNicgZmlsbD0nIzE2MTQwZicvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTYnIHI9JzcnIGZpbGw9JyNlMGI5NmYnLz48L3N2Zz4=">
+</head>
+<body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="../">Resonance Studio</a>
+    <span class="sub">Help</span>
+    <nav>
+      <a href="../app/">Studio</a>
+      <a href="./" aria-current="page">Help</a>
+      <a href="../packs/">Packs</a>
+      <a href="evidence.html">Evidence</a>
+      <a href="../credits/">Credits</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+
+<h1>Help &amp; manual</h1>
+<p class="lede">Everything the studio does, why, and where every number came from. Read it in order the first
+time, or jump to a chapter below.</p>
+
+<div class="callout">
+  <p><b>The one-sentence version:</b> this is a tone studio — it plays precisely scheduled layers of sound
+    (paired tones, pulses, noise) that you can edit, save and share, and it is honest about what the research
+    does and does not support. Nothing here is a medical device and nothing here needs an account or a network
+    connection.</p>
+</div>
+
+<h2 id="toc">Contents</h2>
+<div class="toc">
+  <ol>
+    <li><a href="#what">What these tones are</a></li>
+    <li><a href="#parts">The studio, part by part</a></li>
+    <li><a href="#library">The library: packs and sessions</a></li>
+    <li><a href="#numbers">Reference: every number in the quick picks</a></li>
+    <li><a href="#gateway">Focus levels and the Gateway tapes</a></li>
+    <li><a href="#schumann">Schumann resonances, solfeggio and the rest</a></li>
+    <li><a href="#speakers">Headphones, speakers and rooms</a></li>
+    <li><a href="#build">Building your own session</a></li>
+    <li><a href="#format">The .gnaural file format</a></li>
+    <li><a href="#elsewhere">Taking it elsewhere</a></li>
+    <li><a href="#faq">Questions and troubleshooting</a></li>
+    <li><a href="#safety">Safety and honest limits</a></li>
+  </ol>
+</div>
+
+<hr>
+
+<h2 id="what">1 · What these tones are</h2>
+
+<p>Four different things get called “binaural beats” in casual use. They are physically different, and one of
+them survives a loudspeaker while another does not.</p>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>Binaural beats — need headphones</h3>
+    <p>Two steady sine tones, one sent to each ear, a few Hz apart. Left ear hears 200 Hz, right ear hears
+      204 Hz, and the listener reports a slow throb at the difference. Most of the evidence points to the
+      beat being generated in the brainstem (the superior olivary complex), which is exactly why it needs the
+      channels kept apart: <b>if both ears hear both tones, the beat is gone</b>. Clinical writing treats
+      headphones as part of the method, not a preference.</p>
+    <p class="small">In this studio: voice type <i>binaural</i>. On speakers you hear two quiet tones and no beat.</p>
+  </div>
+  <div class="card">
+    <h3>Monaural beats — work on speakers</h3>
+    <p>The same two tones, but both played to both ears. The beat is the acoustic interference of the two
+      waves and it exists in the air of the room, so a single speaker carries it. It tends to sound more like
+      a rough, buzzing throb than the smooth pulse of a binaural beat.</p>
+    <p class="small">In this studio: two <i>steady tones</i> a few Hz apart, and the <b>“the acoustic beat”</b>
+      session in the Speakers pack.</p>
+  </div>
+  <div class="card">
+    <h3>Isochronic pulses — work anywhere</h3>
+    <p>A single carrier switched on and off at the session's rate — 50% on, 50% off, edges smoothed. There is
+      no interaural trick at all: the modulation is in the signal, so it survives loudspeakers, a mono
+      fold-down, a phone speaker, a room. This is the same stimulus class as the amplitude-modulated tones
+      used in clinical auditory steady-state testing.</p>
+    <p class="small">In this studio: voice type <i>isochronic</i>, and the <b>Speakers</b> pack is built from
+      nothing else.</p>
+  </div>
+  <div class="card">
+    <h3>Noise — a bed, not a beat</h3>
+    <p>Not modulation at all: broad-band sound used as a bed, either to mask a room or to give the ear
+      something even to rest on. The three colours here are level-matched to each other, so a bed written at
+      one volume sounds equally loud whichever you pick.</p>
+    <p class="small">In this studio: <i>pink</i> (−3 dB per octave), <i>brown</i> (−6 dB per octave, deeper),
+      <i>white</i> (flat). All three are stereo and independent per channel, so they lose a few dB in a mono
+      fold-down — the pulses and monaural layers around them do not.</p>
+  </div>
+</div>
+
+<h3>What the body of research actually supports</h3>
+<p>A periodic sound at rate R produces a measurable neural response phase-locked to R while it is playing —
+the frequency-following response and the auditory steady-state response. That effect grows with level up to
+about 80 dB SPL, and it is established. What is not established is the second half of the popular claim: that
+listening to a rate for a while durably changes your brain state. The 2023 systematic review of 14 EEG studies
+found 5 in line with the entrainment hypothesis, 8 contradicting it, and 1 mixed, concluding there was no clear
+trend either way. <a href="evidence.html">The evidence page</a> has the citations and a claim-by-claim
+ledger.</p>
+
+<hr>
+
+<h2 id="parts">2 · The studio, part by part</h2>
+
+<table>
+  <thead><tr><th>Panel</th><th>What it is for</th></tr></thead>
+  <tbody>
+    <tr><td><b>Session browser</b> (left, top)</td><td>Search or filter the whole library, star favourites
+      (kept in your browser only), or roll the dice with <i>Surprise me</i>. The dropdown underneath is the
+      same list in plain form.</td></tr>
+    <tr><td><b>Quick picks</b> (left)</td><td>Named rates and numbers you can add as a layer with one click —
+      EEG bands, Schumann resonances, paced-breathing rates, the focus-level layouts, solfeggio and other
+      historical lists, and the three noise beds. Each group states what its numbers are.</td></tr>
+    <tr><td><b>Files</b> (left)</td><td>Open a <code>.gnaural</code>, add a whole <code>.zip</code> pack,
+      write the current session back out as <code>.gnaural</code>, render it to WAV at a chosen length, or copy
+      a share link that contains the session itself.</td></tr>
+    <tr><td><b>Stage</b> (centre)</td><td>The graph of the current schedule: carrier, rate and volume against
+      time, one line per voice, with the playhead. The line under it reports voices, entries, length and loop
+      state.</td></tr>
+    <tr><td><b>What you are hearing</b> (centre)</td><td>A plain-language breakdown of every voice in the
+      current session — carrier, rate, which band that rate sits in, and whether the layer needs headphones or
+      not.</td></tr>
+    <tr><td><b>Pack downloads</b> (centre)</td><td>The same sessions as <code>.zip</code> archives for the
+      desktop Gnaural or for safekeeping. Importing one back is one button.</td></tr>
+    <tr><td><b>Live</b> (right)</td><td>Channel levels, a spectrum of what is actually leaving the output, the
+      rate-to-band readout, a phase wheel for the selected pair or pulses, and the tools (timer, pacer,
+      stop-and-mute).</td></tr>
+    <tr><td><b>Voices / Entries</b> (right)</td><td>The editor. A session is a stack of voices; a voice is a
+      list of timed entries. Click a voice to select it, edit any number in place, add or delete entries.</td></tr>
+  </tbody>
+</table>
+
+<h3>The rule that explains everything about the editor</h3>
+<div class="callout">
+  <p>An entry's values are the values <i>at the start of that entry</i>, and the voice glides from them to the
+    next entry's values over the entry's duration. The last entry wraps around to the first. So:</p>
+  <ul>
+    <li>to <b>hold</b> a level, the next entry must repeat it (a hold is two entries with the same numbers);</li>
+    <li>to <b>fade in</b>, start at zero and put the target value on the next entry;</li>
+    <li>to <b>glide</b> a rate, give the next entry the new rate — the slide happens over the current entry's
+      duration.</li>
+  </ul>
+  <p class="small">This is Gnaural's rule, kept exactly, and it is why a session exported from here behaves
+    the same in the desktop program. It is also the single most common mistake: a “hold” written without
+    repeating the level becomes one long fade-out.</p>
+</div>
+
+<hr>
+
+<h2 id="library">3 · The library: packs and sessions</h2>
+<p>The built-in library is original to this site: every session is a tone schedule written here, with no audio
+or text from any recording, programme or product. The packs are themed rather than clinical.</p>
+<table>
+<thead><tr><th>Pack</th><th class="num">Sessions</th><th>What it is</th></tr></thead>
+<tbody>
+<!--TABLE:packs-->
+<tr><td><b>Classic sessions</b></td><td class="num">15</td><td>The classic sessions: focus layouts, naps, a slow slide, deep rest.</td></tr>
+<tr><td><b>Wave I — F3 to F10</b></td><td class="num">7</td><td>Wave I — the first set of focus layouts, one session per level.</td></tr>
+<tr><td><b>Wave II — F10 to F12</b></td><td class="num">6</td><td>Wave II — the second set of focus layouts.</td></tr>
+<tr><td><b>Wave III — F12</b></td><td class="num">5</td><td>Wave III — the third set, with longer holds.</td></tr>
+<tr><td><b>Wave IV — F12 to F15</b></td><td class="num">5</td><td>Wave IV — the fourth set.</td></tr>
+<tr><td><b>Wave V — F15</b></td><td class="num">6</td><td>Wave V — the fifth set, built for longer sittings.</td></tr>
+<tr><td><b>Wave VI — F21</b></td><td class="num">6</td><td>Wave VI — the sixth set.</td></tr>
+<tr><td><b>Wave VII — F21 to F27</b></td><td class="num">6</td><td>Wave VII — the last of the wave-mapped sets.</td></tr>
+<tr><td><b>Sleep &amp; rest</b></td><td class="num">5</td><td>Sleep and rest: slow beds and low rates for winding down and staying down.</td></tr>
+<tr><td><b>Depth — F23 to F26</b></td><td class="num">6</td><td>Deeper focus levels, frozen as sessions of their own.</td></tr>
+<tr><td><b>Speakers — isochronic room sessions</b></td><td class="num">9</td><td>The headphone-free pack: isochronic pulses and one monaural beat, designed for a room.</td></tr>
+<tr><td><b>Tours</b></td><td class="num">4</td><td>Extended tours that walk through several rates in one sitting.</td></tr>
+<tr><td><b>Schumann resonances</b></td><td class="num">8</td><td>The measured Earth-ionosphere resonance numbers, as tone sets — physics, plainly labelled.</td></tr>
+<tr><td><b>Breathing — six a minute</b></td><td class="num">8</td><td>Paced-breathing sessions at the rates used in the HRV literature, with the pacer tool.</td></tr>
+<tr><td><b>Solfeggio (the historical set)</b></td><td class="num">7</td><td>The 1990s solfeggio set and other historical lists, kept as history.</td></tr>
+<tr><td><b>Sleep ladder</b></td><td class="num">7</td><td>A sleep ladder: sessions that descend in steps and hold.</td></tr>
+<tr><td><b>Focus series (speaker pulses)</b></td><td class="num">8</td><td>Speaker-friendly focus sessions for a desk or a room, at 40, 18, 14 and 10 a second.</td></tr>
+<tr><td><b>Deep listener (long tours)</b></td><td class="num">6</td><td>Long-form listener sessions that move slowly through several rates.</td></tr>
+<!--/TABLE:packs-->
+</tbody>
+</table>
+<p class="small">Upstream Gnaural's preset archive is deliberately not bundled — it carries no licence.
+    Use <b>Open .gnaural</b> for files you already have.</p>
+
+<hr>
+
+<h2 id="numbers">4 · Reference: every number in the quick picks</h2>
+<p>These tables are generated from the same data file the studio's quick-pick buttons use, so the page and the
+buttons can never disagree. The status column is the honest one: what a number <i>is</i>.</p>
+
+<h3>EEG band names (descriptive conventions)</h3>
+<table>
+<thead><tr><th>Band</th><th class="num">Range (Hz)</th><th>What the name means</th></tr></thead>
+<tbody>
+<tr><td><b>delta</b></td><td class="num">0.5 – 4</td><td>the slowest band; the rate of deep sleep</td></tr>
+<tr><td><b>theta</b></td><td class="num">4 – 8</td><td>the drowsy / drifting band</td></tr>
+<tr><td><b>alpha</b></td><td class="num">8 – 13</td><td>the relaxed, eyes-closed band</td></tr>
+<tr><td><b>SMR</b></td><td class="num">13 – 15</td><td>sensorimotor rhythm, 12-15 Hz</td></tr>
+<tr><td><b>beta</b></td><td class="num">15 – 30</td><td>the ordinary waking band</td></tr>
+<tr><td><b>gamma</b></td><td class="num">30 – 100</td><td>the fast band; 40 Hz is the one usually named</td></tr>
+</tbody></table>
+
+<h3>Schumann resonances — measured physics</h3>
+<table>
+<thead><tr><th>Name</th><th class="num">Number</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>7.83 Hz — fundamental</code></td><td class="num">7.83 Hz</td><td><span class="status physics">physics</span></td><td>the first mode, around 7.8 Hz and drifting with ionospheric conditions</td></tr>
+<tr><td><code>14.3 Hz — second mode</code></td><td class="num">14.3 Hz</td><td><span class="status physics">physics</span></td><td>measured near 14.3 Hz</td></tr>
+<tr><td><code>20.8 Hz — third mode</code></td><td class="num">20.8 Hz</td><td><span class="status physics">physics</span></td><td>measured near 20.8 Hz</td></tr>
+<tr><td><code>27.3 Hz — fourth mode</code></td><td class="num">27.3 Hz</td><td><span class="status physics">physics</span></td><td>measured near 27.3 Hz</td></tr>
+<tr><td><code>33.8 Hz — fifth mode</code></td><td class="num">33.8 Hz</td><td><span class="status physics">physics</span></td><td>measured near 33.8 Hz</td></tr>
+<tr><td><code>7.83 Hz — monaural pair</code></td><td class="num">7.83 Hz</td><td><span class="status physics">physics</span></td><td>two steady carriers 7.83 Hz apart (e.g. 100 + 107.83); the beat happens in the air, so one speaker carries it</td></tr>
+</tbody></table>
+<p class="small">The resonances are real electromagnetic phenomena in the Earth–ionosphere cavity. Playing an
+audio tone at 7.83 Hz represents the number; it does not couple your living room to the ionosphere.</p>
+
+<h3>Resonance breathing — paced practice</h3>
+<table>
+<thead><tr><th>Name</th><th class="num">Number</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>6 breaths/min (0.1 Hz)</code></td><td class="num">0.1 Hz</td><td><span class="status practice">practice</span></td><td>the usual 'resonance frequency' rate in the HRV literature</td></tr>
+<tr><td><code>5.5 breaths/min</code></td><td class="num">0.0917 Hz</td><td><span class="status practice">practice</span></td><td>the rate used in the Rosary/Ave Maria breathing studies</td></tr>
+<tr><td><code>5 breaths/min</code></td><td class="num">0.0833 Hz</td><td><span class="status practice">practice</span></td><td>slower end of the paced-breathing range</td></tr>
+<tr><td><code>7.5 breaths/min</code></td><td class="num">0.125 Hz</td><td><span class="status practice">practice</span></td><td>a gentler pace if six is uncomfortable</td></tr>
+<tr><td><code>0.1 Hz on a 200 Hz carrier</code></td><td class="num">0.1 Hz</td><td><span class="status practice">practice</span></td><td>the same rate with a mid-band carrier that small speakers reproduce</td></tr>
+</tbody></table>
+<p class="small">Around six breaths a minute the cardiovascular feedback loop is usually said to resonate;
+that is why the rate is called the resonance frequency. The HRV literature supports short-term changes in
+heart-rate variability; it does not support outcome claims. The <b>Pacer</b> tool in the studio is the visual
+version of these rates.</p>
+
+<h3>Focus-level layouts — our own schedules from published measurements</h3>
+<table>
+<thead><tr><th>Name</th><th class="num">Number</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>Focus layout 10</code></td><td class="num">4 Hz</td><td><span class="status source">source</span></td><td>100[1.5] / 200[4.0] / 250[4.0] / 300[4.0]</td></tr>
+<tr><td><code>Focus layout 12</code></td><td class="num">10 Hz</td><td><span class="status source">source</span></td><td>adds 400[10.0] / 500[10.1] / 600[4.8]</td></tr>
+<tr><td><code>Focus layout 15</code></td><td class="num">7.05 Hz</td><td><span class="status source">source</span></td><td>adds 500[7.05] / 630[7.1] / 750[7.0]</td></tr>
+<tr><td><code>Focus layout 21</code></td><td class="num">16.2 Hz</td><td><span class="status source">source</span></td><td>200[4.0] / 250[5.4] / 300[5.4] / 600[16.2] / 750[16.2] / 900[16.2]</td></tr>
+<tr><td><code>Focus layout 27</code></td><td class="num">4 Hz</td><td><span class="status source">source</span></td><td>50[0.80] / 400[4.0] / 503[4.2] / 600[4.0] / 750[4.0] / 900[4.0]</td></tr>
+<tr><td><code>Measured return signal</code></td><td class="num">22 Hz</td><td><span class="status source">source</span></td><td>281.20 + 22.00 Hz, the measured return-to-waking pair rendered as a beat</td></tr>
+</tbody></table>
+<p class="small">Notation: <code>carrier[beat]</code> — a beat of <i>beat</i> Hz around a carrier of
+<i>carrier</i> Hz. These layouts are original schedules written for this site from publicly documented
+frequency sets; see the next chapter.</p>
+
+<h3>Solfeggio and other historical lists</h3>
+<table>
+<thead><tr><th>Name</th><th class="num">Number</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>174 Hz</code></td><td class="num">174 Hz</td><td><span class="status tradition">tradition</span></td><td>the lowest of the set</td></tr>
+<tr><td><code>285 Hz</code></td><td class="num">285 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>396 Hz</code></td><td class="num">396 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>417 Hz</code></td><td class="num">417 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>528 Hz</code></td><td class="num">528 Hz</td><td><span class="status tradition">tradition</span></td><td>the one usually called the 'love frequency'</td></tr>
+<tr><td><code>639 Hz</code></td><td class="num">639 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>741 Hz</code></td><td class="num">741 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>852 Hz</code></td><td class="num">852 Hz</td><td><span class="status tradition">tradition</span></td><td></td></tr>
+<tr><td><code>963 Hz</code></td><td class="num">963 Hz</td><td><span class="status tradition">tradition</span></td><td>the highest of the set</td></tr>
+<tr><td><code>A = 432 Hz</code></td><td class="num">432 Hz</td><td><span class="status tradition">tradition</span></td><td>a tuning-preference debate, not a frequency effect: orchestras have tuned all over the map historically and the audible difference is the ordinary one between two pitches</td></tr>
+<tr><td><code>A = 440 Hz</code></td><td class="num">440 Hz</td><td><span class="status practice">practice</span></td><td>the modern concert-pitch standard</td></tr>
+</tbody></table>
+<p class="small">These are a 1990s folk system (Puleo &amp; Horowitz), not a scientific one, and the popular
+“528 Hz repairs DNA” line has no peer-reviewed support. They are pleasant steady tones with interesting
+provenance, and that is exactly how this site treats them.</p>
+
+<h3>Noise beds</h3>
+<table>
+<thead><tr><th>Name</th><th class="num">Number</th><th>Status</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>Pink noise</code></td><td class="num">—</td><td><span class="status practice">practice</span></td><td>-3 dB per octave; the standard broadband masking bed</td></tr>
+<tr><td><code>Brown noise</code></td><td class="num">—</td><td><span class="status practice">practice</span></td><td>-6 dB per octave; deeper and softer, popular for sleep and for masking low-frequency rumble</td></tr>
+<tr><td><code>White noise</code></td><td class="num">—</td><td><span class="status practice">practice</span></td><td>flat across the spectrum; the brightest of the three</td></tr>
+</tbody></table>
+
+<hr>
+
+<h2 id="gateway">5 · Focus levels and the Gateway tapes</h2>
+
+<p>The best-known body of work in this field is the Monroe Institute's <b>Gateway programme</b> and its
+<i>Hemi-Sync</i> audio. It is worth knowing exactly what it is, because it is the source of most of the
+vocabulary that circulates — and because it is where a lot of confident but unsupported claims come from.</p>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>What it is</h3>
+    <p>Robert Monroe (1915–1995) was an American radio executive who began reporting out-of-body experiences in
+      the 1950s and founded the institute that bears his name. He patented an audio technique in 1975 (US
+      3,884,218) for “a method of inducing mental states” using tones delivered to each ear — the binaural-beat
+      idea, commercialised as <b>Hemi-Sync</b>.</p>
+    <p>The Gateway programme is delivered as a sequence of guided audio exercises, sold as <b>waves</b> —
+      <i>Discovery</i>, <i>Threshold</i>, <i>Freedom</i>, <i>Adventure</i>, <i>Exploring</i>, <i>Odyssey</i>,
+      <i>Voyager</i>, plus a later <i>Union</i> wave. Within the exercises the narrator directs attention to
+      <b>focus levels</b>, numbered 10, 12, 15, 21, 27 and so on, which the programme describes as states of
+      consciousness.</p>
+  </div>
+  <div class="card">
+    <h3>What is measured, and what is claimed</h3>
+    <p>The <b>tone architecture</b> of those recordings has been independently measured and republished since
+      the 1990s — you can find the carrier and beat sets listed in enthusiast archives and in the SBaGen
+      community's notes, level by level. Those published sets are the only part of it this site uses.</p>
+    <p>The <b>state claims</b> — that a level takes you somewhere specific — rest on the institute's own
+      material and on small internal studies, not on independent replication, and the same
+      entrainment question applies: 8 of 14 EEG studies reviewed in 2023 found evidence against durable
+      entrainment. Treat the level names as labels for tone sets, not as destinations.</p>
+  </div>
+</div>
+
+<h3>How this studio relates to it</h3>
+<div class="callout">
+  <p>Our focus-level presets are <b>original tone schedules written for this site</b> from those publicly
+    documented frequency sets. They contain no audio, no narration, no scripts and no manual text from the
+    recordings or the institute's materials, they are named descriptively rather than after individual
+    exercises, and there is <b>no affiliation of any kind</b> with the Monroe Institute or Hemi-Sync. Work
+    through them in order and give each one several sittings before moving on — they are long schedules, and
+    the interesting part is the progression, not any single one.</p>
+</div>
+
+<p><b>Practical note:</b> the programme is a headphone practice. Every focus-level preset here is a binaural
+layout, so it needs headphones for the beat to exist at all. If you want the speaker version of the same idea,
+use the isochronic quick picks or the Speakers pack.</p>
+
+<hr>
+
+<h2 id="schumann">6 · Schumann resonances, solfeggio and the rest</h2>
+
+<h3>Schumann resonances</h3>
+<p>In 1952 Winfried Otto Schumann worked out that the cavity between the Earth's surface and the ionosphere
+acts as a resonator for extremely-low-frequency electromagnetic waves, and the resonances were measured from
+the 1960s onwards — the fundamental sits near <b>7.83 Hz</b>, with higher modes around <b>14.3, 20.8, 27.3 and
+33.8 Hz</b>, all drifting slightly with ionospheric conditions. Every lightning strike is broadband
+excitation.</p>
+<p>They are real. What is not real physics is the step that usually gets made next — that a tone at 7.83 Hz
+from your speakers connects to, tunes into, or harmonises with that cavity. Audio is pressure waves in air at
+20 Hz–20 kHz; the cavity resonance is an electromagnetic mode at 7.83 Hz. They share a number and nothing
+else. The studio's Schumann entries are labelled <i>physics</i> for the number and make no claim about the
+tone.</p>
+
+<h3>Solfeggio, 432 Hz and the historical lists</h3>
+<p>The solfeggio set (174, 285, 396, 417, 528, 639, 741, 852, 963) comes from a 1990s book by Joseph Puleo and
+Leonard Horowitz, built on a numerological reading of the syllables of a Latin hymn. It is a modern invention
+with a retrofitted history, not a medieval tuning. The “528 Hz” entry in particular carries a widely repeated
+DNA-repair claim with no peer-reviewed support; the studio labels the whole set <i>tradition</i> and says so on
+the page.</p>
+<p>The A = 432 Hz debate is a different case: there is real history there (orchestral pitch has wandered all
+over Europe for centuries, and 440 Hz is a 20th-century standardisation), but the audible difference between
+432 and 440 is simply the interval between two pitches. Nobody has demonstrated an effect beyond that.</p>
+
+<h3>Resonance breathing</h3>
+<p>Slow paced breathing near six breaths a minute (~0.1 Hz) sits at the frequency where blood-pressure
+oscillations reinforce the breathing rhythm through the baroreflex — the “resonance” in the name is that
+feedback loop, not a mystical one. Studies of paced breathing show changes in short-term heart-rate
+variability; claims about longer-term health outcomes are where the evidence thins out. The studio's
+<b>Pacer</b> tool and the 0.1 Hz quick picks are for doing it, not for proving anything.</p>
+
+<h3>Rife machines, “angel frequencies” and what is not here</h3>
+<p>Royal Rife's 1930s frequency lists, the “angel” frequency sets, chakra-tone mappings and similar material
+circulate widely. Rife-type devices have been the subject of US Food &amp; Drug Administration warnings and
+cancer-quackery rulings, and there is no controlled evidence for the frequency lists. This studio deliberately
+does not ship those as preset packs: a tone generator has no business dressing a list like that up as a
+feature. If you want to play a specific number, the manual layer builder takes any rate in Hz — with no claim
+attached.</p>
+
+<hr>
+
+<h2 id="speakers">7 · Headphones, speakers and rooms</h2>
+
+<p>The Speakers pack exists because a loudspeaker version of this idea is a genuinely different design problem,
+and the differences are worth knowing:</p>
+
+<table>
+  <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+  <tbody>
+    <tr><td>Why do binaural beats need headphones?</td><td>The beat is created in the auditory brainstem from
+      the <i>difference</i> between the ears. Loudspeakers put both tones into both ears, and the difference
+      disappears.</td></tr>
+    <tr><td>What works on speakers?</td><td>Isochronic pulses (the modulation is in the signal) and monaural
+      beats (the beat is in the air). Both are used in the Speakers pack.</td></tr>
+    <tr><td>Which carriers survive?</td><td>200–500 Hz. Below that, small speakers roll off — and a room's own
+      standing waves reach up to roughly 300 Hz, so a very low carrier is the one that booms in one seat and
+      vanishes in another. A subwoofer does not help this material.</td></tr>
+    <tr><td>One speaker or two?</td><td>Either. A single speaker removes the interference pattern between two
+      sources entirely, which is a feature, not a compromise.</td></tr>
+    <tr><td>Do I have to sit still?</td><td>No. Walking around changes loudness and tone colour as you move
+      through the room's reflections; the pulse rate does not change with position — that is the whole point of
+      an isochronic session.</td></tr>
+    <tr><td>How loud?</td><td>Conversational. The World Health Organization's heuristic is the useful one: if
+      you have to raise your voice to be heard at arm's length, it is too loud. Normal conversation is about
+      60 dB and long exposure above 80 dB is where hearing damage starts. Louder is not “more effect”.</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2 id="build">8 · Building your own session</h2>
+
+<ol>
+  <li><b>Start from something close.</b> Load a library session, then bend it. Everything is editable.</li>
+  <li><b>Add a layer.</b> Use a quick pick (one click, with the right type chosen for you) or <i>Build a layer
+    by hand</i> for any rate and carrier you like. Quick-pick layers are added at the length set in the tools
+    panel.</li>
+  <li><b>Edit the entries.</b> Click a voice in the Voices panel; its entries appear as a table of numbers.
+    Duration, carrier, rate, and the two channel volumes are all editable in place. Add or delete entries with
+    the buttons beside each row.</li>
+  <li><b>Respect the wrap rule.</b> Values ramp into the next entry and the last wraps to the first — so a hold
+    means repeating a value, and a fade-out means the following entry is zero.</li>
+  <li><b>Check the graph.</b> The stage graph is the fastest way to see a mistake: a bed that should be flat and
+    is not, a rate that slides when it should hold.</li>
+  <li><b>Listen at a low level</b> before you commit to a long session, and use the timer if you are going to
+    fall asleep to it.</li>
+  <li><b>Keep it.</b> <i>Save .gnaural</i> writes the file, <i>Export WAV</i> renders audio, and <i>Copy share
+    link</i> puts the entire session into the URL — paste it into a message and the recipient gets the same
+    session, still fully editable.</li>
+</ol>
+
+<h3>Recipes worth trying</h3>
+<ul>
+  <li><b>A speaker session for a room:</b> brown noise bed at 0.04, plus a 10 Hz isochronic pulse on 300 Hz at
+    0.12, plus a slow fade-in over two minutes.</li>
+  <li><b>A desk-focus hour:</b> load a speaker-focus session, then add a 40 Hz pulse on 320 Hz for the first
+    ten minutes only (short duration entry, then delete-then-hold the rest).</li>
+  <li><b>A gentle landing:</b> an alpha-range pair (10 Hz around 200 Hz) for 10 minutes, sliding to a
+    theta-range 6 Hz for 15, with the last three entries fading out.</li>
+  <li><b>Paced breathing:</b> start the pacer at 6 a minute, and add the 0.1 Hz pulse quick pick so the room
+    keeps the pace for you while you breathe.</li>
+</ul>
+
+<hr>
+
+<h2 id="format">9 · The .gnaural file format</h2>
+<p>The studio reads and writes Gnaural's own XML format (<code>gnauralfile_version 1.20101006</code>), so files
+round-trip with the desktop program. The shape is simple:</p>
+<pre class="mono small">&lt;schedule&gt;
+  &lt;title&gt;My session&lt;/title&gt;
+  &lt;loops&gt;1&lt;/loops&gt;                    &lt;!-- 0 = loop forever --&gt;
+  &lt;voice&gt;
+    &lt;description&gt;pair&lt;/description&gt;
+    &lt;type&gt;0&lt;/type&gt;                  &lt;!-- 0 pair, 1 pink, 3 pulses, 4 alt pulses, 7 white, 8 brown --&gt;
+    &lt;entry parent="0" duration="60" volume_left="0.12" volume_right="0.12"
+           beatfreq="7.83" basefreq="200" state="1"/&gt;
+  &lt;/voice&gt;
+&lt;/schedule&gt;</pre>
+<ul>
+  <li><code>duration</code> is seconds; <code>volume_*</code> is a linear 0–1 gain; <code>basefreq</code> is
+    the carrier in Hz and <code>beatfreq</code> is the true rate in Hz (the engine halves it internally, as
+    upstream does).</li>
+  <li><b>Types 7 and 8 (white and brown noise) are this project's extension.</b> Upstream reserves 5 and 6 for
+    sample-based water and rain, which this port does not implement. A file using 7 or 8 plays here and is
+    reported as an unknown type by other Gnaural builds — the site never writes them into a file unless you
+    built a bed with them.</li>
+  <li>Values are written with up to six decimals; nothing is rounded in a way that changes a rate.</li>
+</ul>
+
+<hr>
+
+<h2 id="elsewhere">10 · Taking it elsewhere</h2>
+<ul>
+  <li><b>The desktop Gnaural</b> (the program this engine follows) opens anything you save here, and its
+    presets open here.</li>
+  <li><b>Any audio tool</b> can take the WAV export — it is rendered in your browser at 44.1 kHz, exactly the
+    schedule you see.</li>
+  <li><b>DAWs and controllers:</b> a rendered WAV drops into any arrangement or sampler. The live scheduling
+    can only happen in this page: it is generated sample-by-sample by the same engine used for export.</li>
+  <li><b>Offline:</b> keep the page open, or save the whole site folder — there is no server dependency in the
+    studio itself beyond fetching the page once.</li>
+</ul>
+
+<hr>
+
+<h2 id="faq">11 · Questions and troubleshooting</h2>
+
+<h3>I pressed Play and nothing happened</h3>
+<p>Browsers refuse to start audio until you interact with the page — press Play again (the first press creates
+the audio context). If the level meters move but you hear nothing, check the master volume and the system
+output device.</p>
+
+<h3>A session sounds like it does nothing</h3>
+<p>Many sessions are deliberately quiet beds with a slow pulse — listen on headphones before deciding. Also
+check the mode pill: <i>fallback</i> means the page fell back from the audio worklet to the main-thread
+engine, which works but can stutter on a busy machine.</p>
+
+<h3>My edit made the level fade away</h3>
+<p>You edited a “hold” into a fade: an entry whose following entry is lower ramps <i>down</i> over its own
+duration. Repeat the value on the next entry to hold it (see the wrap rule above).</p>
+
+<h3>I loaded a preset and the beat vanished</h3>
+<p>You are on speakers with a binaural pair. Use the Speakers pack, an isochronic quick pick, or headphones.</p>
+
+<h3>Importing a pack did nothing</h3>
+<p>Packs must be <code>.zip</code> archives containing <code>.gnaural</code> files; the reader rejects damaged
+or oversized archives with a message rather than half-importing them. Anything it does import is remembered in
+your browser and can be removed with <b>Remove imported</b>.</p>
+
+<h3>The WAV export is huge</h3>
+<p>44.1 kHz stereo float-to-16-bit is about 10 MB a minute. Export a shorter length for a taste test; the
+session itself is a few kilobytes of XML.</p>
+
+<h3>Does anything leave my machine?</h3>
+<p>No. There is no server-side processing, no account, no analytics, no fonts or scripts from anywhere else.
+The share links encode the session in the URL fragment, which browsers never send to a server.</p>
+
+<hr>
+
+<h2 id="safety">12 · Safety and honest limits</h2>
+<div class="callout warn">
+  <ul>
+    <li><b>Not a medical device.</b> Nothing here diagnoses, treats, cures or prevents anything, and no
+      schedule here is a therapy.</li>
+    <li><b>Epilepsy and seizure disorders:</b> repetitive pulsed tones are audio, not flicker, and whether they
+      carry any comparable risk could not be established either way in the sources checked. Treat that as
+      unknown rather than as safe, and ask a clinician first.</li>
+    <li><b>Hearing:</b> keep levels conversational (see the WHO heuristic above). Long exposure to loud sound
+      damages hearing, and a pulse train reads as more alerting than a steady tone at the same level.</li>
+    <li><b>Attention:</b> do not use the studio where you need to hear what is going on around you, and never
+      while driving.</li>
+    <li><b>Stop</b> if it is unpleasant, gives you a headache, or leaves your ears ringing.</li>
+  </ul>
+</div>
+
+<div class="callout good">
+  <p><b>And the honest upside:</b> it is a precise, well-built tone studio with a large library, an editor, a
+    renderer and no lock-in. If you enjoy working with sound and rhythm, that is a real thing to have, whether
+    or not the grander claims in this field ever pan out.</p>
+</div>
+
+<p class="small">See also: <a href="evidence.html">the evidence page and reference list</a> ·
+<a href="../credits/">credits, licence and provenance</a> ·
+<a href="../packs/">pack downloads</a>.</p>
+
+</main>
+
+<footer class="site">
+  <div class="shell">
+    <p><b>Gnaural Web</b> · <a href="../">Resonance Studio</a> · <a href="../app/">Studio</a> ·
+      <a href="../packs/">Packs</a> · <a href="evidence.html">Evidence</a> · <a href="../credits/">Credits</a> ·
+      <a href="../app/NOTICE.txt">NOTICE.txt</a> · <a href="https://moddys.net/">moddys.net</a></p>
+    <p class="small">Gnaural is © Bret Logan and contributors. The upstream engine is LGPL-2.1-or-later; this
+      port keeps those terms and the rest of the site is GPL-2.0-or-later. Not affiliated with the upstream
+      project, the Monroe Institute or any other programme.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  try {
+    var prefs = JSON.parse(localStorage.getItem("resonance.prefs.v1") || "{}");
+    if (prefs.skin) document.documentElement.setAttribute("data-skin", prefs.skin);
+    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+      document.documentElement.setAttribute("data-skin", "paper");
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

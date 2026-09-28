@@ -1,0 +1,112 @@
+Gnaural Web — attribution and licensing
+=======================================
+
+A browser re-implementation of Gnaural's scheduling engine and .gnaural preset
+format, built for the moddys.net music hub ("runs here" collection).
+
+UPSTREAM
+--------
+Gnaural — Copyright (C) Bret Logan and contributors.
+  Reference version used: 1.0.20110606 (engine: BinauralBeat.c / BinauralBeat.h;
+  preset readers/writers: gnauralXML.c / ScheduleXML.c; app: main.c).
+
+LICENSING OF THIS PORT
+----------------------
+engine.js — a re-implementation of Gnaural's BinauralBeat engine. The upstream
+            engine is licensed LGPL-2.1-or-later; this port is distributed under
+            the same terms. Licence text: COPYING.LESSER.
+All other files — GPL-2.0-or-later. Licence text: COPYING.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the licence texts for details.
+
+PRESETS AND PACKS
+-----------------
+The 79 sessions built into this page are original to gnaural-web: 15 classic
+presets plus 64 sessions generated from published focus-level tone sets and the
+speaker/isochronic design (see below), arranged into twelve downloadable packs
+(Classic, Waves I-VII, Sleep & rest, Depth, Speakers, Tours) as plain .gnaural
+files under pack/. The pack READMEs repeat this
+licensing position. Upstream Gnaural preset files are NOT bundled: the upstream
+preset archive (SourceForge "Presets" folder) states no licence, so those files
+are treated as all rights reserved. You can open any .gnaural file you already
+hold with "Open .gnaural…", and a downloaded pack can be dropped back on this
+page to add its sessions in the browser that loads it.
+
+SPEAKER PACKS (NO HEADPHONES)
+-----------------------------
+The speaker pack is built for loudspeakers and does not use a single binaural
+pair: its layers are isochronic pulses (one carrier switched on and off at the
+session's rate — identical in both channels, so one speaker or a pair carries
+them) and, in one session, two steady carriers four cycles apart whose beat
+happens in the air of the room (a monaural beat). The pack's tests assert that
+no session contains an interaural pair.
+Nothing here is a medical claim, and the evidence is stated as it is: a periodic
+tone does produce a measurable neural response phase-locked to its rate while it
+plays (the frequency-following / auditory steady-state response; Bidelman &
+Powers 2018), but that listening to a rate durably changes brain state is not
+established — the systematic review of 14 EEG studies found 8 contradicting the
+entrainment hypothesis, 5 supporting it and 1 mixed, with "no clear trend"
+(Ingendoh et al., PLOS ONE 2023). The 50% on/off pulse duty is a commercial
+convention, not a research finding, and this engine's ~2 ms pulse edges differ
+from the ~5 ms cosine ramps used in gating research; nothing is claimed about
+either. Not a medical device. Repetitive pulsed tones: ask a clinician first if
+you have epilepsy or a seizure disorder.
+
+FOCUS-LEVEL PRESETS
+--------------------
+The "Focus"-named presets and the focus-level packs are original tone schedules
+inspired by the publicly documented focus-level tone sets of the Monroe
+Institute's Gateway programme — layered carrier[beat] pairs that have been
+independently measured and republished since the 1990s (notation "503[4.2]"
+meaning a 4.2 Hz beat between two carriers equally separated from 503 Hz). They
+are recreations of a documented *frequency architecture* only: no audio,
+narration, scripts or printed material from those recordings are reproduced
+here, and no exercise names from that programme are used. The wave packs follow
+its published level order (wave I: focus 3 into 10; II: the focus-12 tools;
+III-IV: the 10-12 band; V: focus 15; VI: focus 21; VII: focus 27), and its own
+notes' 30-45 minute sitting length and pink-noise bed convention are what these
+session shapes are built around.
+
+Where the sources disagree, this page states what it used: the focus-21 set here
+is the "sometimes" reading (250/300 at a 5.4 Hz beat) *plus* the 900[16.2] layer
+that every published variant of that level carries; the focus-27 set is the
+second measurement's (50 Hz layer at 0.80 Hz); depth levels 23-26 come from the
+second measurement lineage (all published sets trace to one analyst's reading —
+no independent second measurement of levels 23-26 was located); level 22 is
+described as identical to 21 in every source, so it gets no separate session.
+Two documented conventions from the source material are kept literally: sessions
+that bring you back up end with the measured return-to-waking signal (a beta
+pair around 281 Hz carrying a ~22 Hz beat), and the noise bed sits well under
+the carriers (the published study's figure is ~15 dB).
+
+NO AFFILIATION
+--------------
+This page is not affiliated with, endorsed by, or supported by the Gnaural
+project. The name "Gnaural" is used only to describe the format and engine
+lineage.
+
+It is likewise not affiliated with, endorsed by, or supported by the Monroe
+Institute, and no material from that programme is reproduced here. "Hemi-Sync",
+"Gateway Experience" and the focus-level names are their trademarks and appear
+in these files only descriptively, as labels for the published tone sets this
+page's original schedules were built from.
+
+SAFETY
+------
+Binaural beats are an audio experience, not a medical treatment. Keep volumes
+moderate, skip sessions while driving or operating machinery, and stop if a
+session feels unpleasant.
+
+COMPATIBILITY NOTES
+-------------------
+Playable voice types in this build: 0 binaural beat, 1 pink noise, 3 isochronic
+pulses, 4 alt isochronic pulses. Types 2 (audio file), 5 (water drops) and
+6 (rain) are recognised when reading files but not yet rendered; presets using
+them still play with their remaining voices, and the page says so.
+
+Deviations from upstream, deliberate and documented in engine.js:
+  - output is clamped to [-1, 1] instead of wrapping at 16-bit overflow
+  - the page requests a 44.1 kHz audio context (the engine's sample-rate domain);
+    other output rates are resampled by the browser

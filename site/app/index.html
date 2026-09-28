@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="forge">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resonance Studio — Gnaural Web</title>
+<meta name="description" content="A tone, beat and noise studio in the browser: binaural beats, monaural beats, isochronic pulses and noise beds, with 100+ ready sessions and a full schedule editor. Runs entirely on this site.">
+<link rel="stylesheet" href="studio.css?v=82x">
+<link rel="stylesheet" href="../site.css?v=82x">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNicgZmlsbD0nIzE2MTQwZicvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTYnIHI9JzcnIGZpbGw9JyNlMGI5NmYnLz48L3N2Zz4=">
+</head>
+<body>
+
+<header class="studio">
+  <div class="bar">
+    <div class="brand">
+      <a href="../"><span class="mark">Resonance Studio</span></a>
+      <span class="sub">Gnaural Web</span>
+    </div>
+
+    <div class="transport">
+      <button id="play" class="big">▶ Play</button>
+      <button id="stopBtn" title="stop and rewind">■ Stop</button>
+      <label class="volwrap" id="volknob" title="Volume — drag, scroll, or use [ and ]">
+        <span class="mk-cap" aria-hidden="true">Vol</span>
+        <span class="mk-panel" aria-hidden="true"><span class="pf-knob mk"><span class="mk-collar"></span><span class="pf-knob-face"></span><span class="mk-sheen"></span><span class="pf-knob-mark"></span><span class="pf-knob-ring"></span></span></span>
+        <b class="mk-val" aria-hidden="true">70</b>
+        <input id="master" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="volume">
+      </label>
+      <label class="chk"><input id="loop" type="checkbox" checked> Loop</label>
+      <span id="clock" class="timebox">0:00 / 0:00</span>
+      <progress id="prog" max="1" value="0" hidden></progress>
+      <span class="mtr sr" title="left peak"><i id="meterL"></i></span>
+      <span class="mtr sr" title="right peak"><i id="meterR"></i></span>
+    </div>
+
+    <span class="spacer"></span>
+
+    <div class="prefs">
+      <button id="focusBtn" class="ghost" title="hide the panels and just listen (F)">Focus mode</button>
+      <select id="skin" title="skin" aria-label="skin">
+        <option value="forge">Skin: forge</option>
+        <option value="nocturne">Skin: nocturne</option>
+        <option value="paper">Skin: paper</option>
+      </select>
+      <a href="../help/" style="text-decoration:none">Help</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <main class="grid">
+
+    <!-- ---------------------------------------------------- left column -->
+    <div class="col left">
+      <section class="card">
+        <h3>Session browser</h3>
+        <input id="search" type="search" placeholder="Search 100+ sessions — try sleep, focus, speaker, 7.83…" aria-label="search sessions">
+        <div class="chips" id="filters" role="group" aria-label="filters"></div>
+        <div class="presetsel">
+          <select id="presets" aria-label="preset"></select>
+        </div>
+        <div id="plist" role="listbox" aria-label="session list"></div>
+        <div class="row between" style="margin-top:8px">
+          <button id="randomBtn" class="ghost" title="pick a session from the whole library">🎲 Surprise me</button>
+          <span class="readout" id="count"></span>
+        </div>
+      </section>
+
+      <section class="card keep">
+        <h3>Quick picks</h3>
+        <p class="hint">Add a layer to the current session. Pulses work on any speaker; pairs need headphones.
+          The same numbers appear in the <a href="../help/">help pages</a>.</p>
+        <div id="quickpick"></div>
+      </section>
+
+      <section class="card">
+        <h3>Files</h3>
+        <div class="row">
+          <button id="loadBtn">Open .gnaural</button>
+          <button id="loadPackBtn" title="add every .gnaural in a .zip pack">Add pack (.zip)</button>
+        </div>
+        <input id="file" type="file" accept=".gnaural,.xml,text/xml,application/xml" hidden>
+        <input id="packfile" type="file" accept=".zip,application/zip" hidden>
+        <div class="row between" style="margin-top:10px">
+          <span class="readout" id="packinfo"></span>
+          <button id="rmpacks" style="display:none"></button>
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <button id="saveGnm" title="write this schedule out as a .gnaural file">Save .gnaural</button>
+          <button id="exportBtn" title="render the schedule to a WAV file">Export WAV</button>
+          <select id="exportMin" aria-label="export length">
+            <option value="5">5 min</option>
+            <option value="10">10 min</option>
+            <option value="20" selected>20 min</option>
+            <option value="60">60 min</option>
+            <option value="240">full</option>
+          </select>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button id="shareBtn" class="ghost" title="put this whole schedule into the page URL">🔗 Copy share link</button>
+        </div>
+        <p class="hint" style="margin-top:8px">Every export is made in your browser: no upload, no account, nothing
+          leaves the page.</p>
+      </section>
+    </div>
+
+    <!-- --------------------------------------------------- centre column -->
+    <div class="col centre">
+      <section class="card stage">
+        <div class="row between">
+          <h2 id="nowtitle" style="margin:0">(untitled)</h2>
+          <span class="pill" id="modePill">idle</span>
+        </div>
+        <p class="hint" id="nowsrc" style="margin:.3em 0 .6em"></p>
+        <canvas id="graph" width="1200" height="340" aria-label="schedule graph"></canvas>
+        <div id="meta" class="readout" style="margin-top:8px"></div>
+        <div id="warnings"></div>
+      </section>
+
+      <section class="card">
+        <h3>What you are hearing</h3>
+        <div class="readout" id="hearinfo">Pick a session and its layers are described here — carrier, rate,
+          band name and how it behaves on speakers.</div>
+        <div class="voicechips" id="hearvoices"></div>
+      </section>
+
+      <section class="card">
+        <h3>Pack downloads</h3>
+        <p class="hint">Everything here is built into the studio. These archives are for the desktop Gnaural, for
+          other tools, or for safekeeping — import any of them back with <b>Add pack (.zip)</b>.</p>
+        <div id="pklist"></div>
+      </section>
+    </div>
+
+    <!-- --------------------------------------------------- right column -->
+    <div class="col right">
+      <section class="card">
+        <h3>Live</h3>
+        <div class="meters">
+          <div class="meter">
+            <h4>Level</h4>
+            <div class="bar"><i id="barL"></i></div>
+            <div class="bar" style="margin-top:5px"><i id="barR"></i></div>
+            <canvas id="spec" class="mini" width="400" height="74" aria-label="spectrum"></canvas>
+          </div>
+          <div class="meter">
+            <h4>Rate → band</h4>
+            <div id="bandinfo" class="readout">—</div>
+            <canvas id="phase" width="400" height="150" aria-label="phase wheel"></canvas>
+          </div>
+          <div class="meter">
+            <h4>Tools</h4>
+            <div class="row">
+              <button id="timerBtn" class="ghost">Timer</button>
+              <button id="pacerBtn" class="ghost">Pacer</button>
+              <button id="panicBtn" class="ghost" title="stop and mute immediately">Mute</button>
+            </div>
+            <div id="toolpanes" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Voices — click to select</h3>
+        <p class="hint">Entries ramp into the next entry's values and the last wraps to the first, so a level holds
+          by repeating it.</p>
+        <div id="voicelist"></div>
+        <div class="row" style="margin-top:8px">
+          <button id="addvoiceBtn">+ Add a voice</button>
+          <button id="delvoiceBtn" class="ghost" title="remove the selected voice">Remove voice</button>
+        </div>
+        <h3 style="margin-top:12px">Entries</h3>
+        <div id="entryedit"></div>
+      </section>
+
+      <section class="card">
+        <h3>Keyboard</h3>
+        <div class="readout">
+          <div><kbd>Space</kbd> play / pause · <kbd>Esc</kbd> stop · <kbd>[</kbd> <kbd>]</kbd> volume</div>
+          <div><kbd>←</kbd> <kbd>→</kbd> previous / next session (<kbd>Shift</kbd> skips 10)</div>
+          <div><kbd>F</kbd> focus mode · <kbd>S</kbd> save .gnaural · <kbd>?</kbd> show this list</div>
+          <div><kbd>V</kbd> visualizers on / off · <kbd>Shift</kbd>+<kbd>V</kbd> scramble the scene</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <p><b>Use:</b> headphones for binaural beats — the beat is created in your hearing, not in the file; isochronic
+      pulse presets and the whole Speakers pack work on loudspeakers, and nothing in that pack depends on a difference
+      between your ears. <b>Care:</b> keep volumes moderate — a pulse train is more alerting than a steady tone at the
+      same level, and if you have to raise your voice to be heard at arm's length it is too loud. If you have epilepsy
+      or a seizure disorder, ask a clinician before using repetitive pulsed tones. The visualizer panels can be switched
+      off entirely (<kbd>V</kbd>, or the Visualizers card) and are capped well below the three-flashes-per-second
+      accessibility threshold, but skip them too if flashing images affect you. Not a medical device or treatment;
+      skip it while driving or operating machinery, and stop if it feels unpleasant.</p>
+    <p><b>Gnaural Web</b> is a browser re-implementation of Gnaural's scheduling engine and <code>.gnaural</code>
+      format, written for this site. Gnaural is © Bret Logan and contributors: the upstream engine is
+      LGPL-2.1-or-later and this port keeps those terms; the rest of the page is GPL-2.0-or-later. Not affiliated with
+      the upstream project, the Monroe Institute or any other programme. Upstream presets are not bundled (their
+      archive states no licence); the built-in library is original to this site.
+      <a href="../credits/">Credits &amp; licence</a> · <a href="../help/evidence.html">Evidence</a> ·
+      <a href="../help/">Help</a> · <a href="NOTICE.txt">NOTICE.txt</a> · <a href="https://moddys.net/">moddys.net</a></p>
+  </footer>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- order matters: engine → gnm → presets/packs/rates → pack reader → app → studio panels -->
+<script src="engine.js?v=81p"></script>
+<script src="gnm.js?v=81p"></script>
+<script src="presets.js?v=81p"></script>
+<script src="packs.js?v=81p"></script>
+<script src="rates.js?v=81p"></script>
+<script src="pack.js?v=81p"></script>
+<script src="app.js?v=81q"></script>
+<script src="studio.js?v=82y"></script>
+<!-- visualizer system: mounts its own panels + menu card, follows the audio -->
+<script src="vizmath.js?v=82v"></script>
+<script src="vizpal.js?v=82v"></script>
+<script src="vizmodes.js?v=82v"></script>
+<script src="viz.js?v=82y"></script>
+</body>
+</html>

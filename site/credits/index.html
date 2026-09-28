@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-skin="forge">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credits, licence and provenance — Resonance Studio</title>
+<meta name="description" content="What is original here, what is borrowed, what licence applies, and exactly what this site does and does not claim.">
+<link rel="stylesheet" href="../site.css?v=82x">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNicgZmlsbD0nIzE2MTQwZicvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTYnIHI9JzcnIGZpbGw9JyNlMGI5NmYnLz48L3N2Zz4=">
+</head>
+<body>
+
+<header class="site">
+  <div class="bar">
+    <a class="mark" href="../">Resonance Studio</a>
+    <span class="sub">Credits</span>
+    <nav>
+      <a href="../app/">Studio</a>
+      <a href="../help/">Help</a>
+      <a href="../packs/">Packs</a>
+      <a href="../help/evidence.html">Evidence</a>
+      <a href="./" aria-current="page">Credits</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+
+<h1>Credits, licence and provenance</h1>
+
+<h2 id="gnaural">Gnaural</h2>
+<p>This studio is a browser re-implementation of <b>Gnaural</b>, Bret Logan's open-source binaural-beat
+scheduler. The scheduling model — voices, entries that ramp into the next entry, the last entry wrapping to the
+first — the <code>.gnaural</code> XML format, and the synthesis approach all follow the upstream program
+(<code>BinauralBeat.c</code>, <code>gnauralXML.c</code>, <code>ScheduleXML.c</code>, release 1.0.20110606).</p>
+<ul>
+  <li><b>Engine</b> (<code>engine.js</code>): a re-implementation written from the published upstream source.
+    Upstream is <b>LGPL-2.1-or-later</b>; this port keeps those terms. Full text:
+    <a href="../app/COPYING.LESSER">COPYING.LESSER</a>.</li>
+  <li><b>Everything else</b> on this site — the UI, the panels, the library generator, the preset packs, the
+    help pages: <b>GPL-2.0-or-later</b>. Full text: <a href="../app/COPYING">COPYING</a>.</li>
+  <li>No upstream preset files are bundled: the upstream preset archive states no licence. Use
+    <b>Open .gnaural</b> for files you already have.</li>
+  <li>Not affiliated with, endorsed by, or connected to the upstream project.</li>
+</ul>
+
+<h2 id="original">What is original to this site</h2>
+<ul>
+  <li><b>The whole library</b> — every session, pack and preset is a tone schedule written here. No audio, no
+    narration, no scripts and no manual text from any recording, programme or product is included anywhere on
+    this site.</li>
+  <li><b>The focus-level presets</b> are original schedules built from <i>publicly documented</i> tone
+    frequency sets (carrier-and-beat measurements republished by enthusiasts since the 1990s), named
+    descriptively rather than after any exercise, and shipped with no affiliation of any kind to the Monroe
+    Institute, Hemi-Sync, or any other organisation.</li>
+  <li><b>The speaker pack</b> is designed here: isochronic pulses and one monaural beat, carriers limited to
+    200–500 Hz, no interaural pair anywhere in the pack — and the project's own tests assert that property
+    rather than promising it.</li>
+  <li><b>The evidence discipline</b> — the claim ledger, the statuses on every number, and the refusal to make
+    a medical claim — is this site's own editorial choice.</li>
+</ul>
+
+<h2 id="claims">What this site claims, in full</h2>
+<div class="callout">
+  <p><b>Claimed:</b> the studio produces, edits, renders and shares precisely scheduled tone layers; the
+    synthesis matches the upstream engine's behaviour; a periodic tone at rate R produces a measurable
+    neural response phase-locked to R while it plays (the frequency-following / auditory steady-state
+    response), and that response grows with level.</p>
+  <p><b>Not claimed:</b> that any session here changes your brain state, improves focus or sleep, treats any
+    condition, or has any health effect at all. The 2023 systematic review of 14 EEG entrainment studies found
+    8 contradicting the entrainment hypothesis, 5 supporting it and 1 mixed — no clear trend either way. Where
+    a number comes from a folk tradition, the page says so. Where it comes from physics, the page says how far
+    the physics goes. <a href="../help/evidence.html">The evidence page</a> lists every claim with its
+    status.</p>
+</div>
+
+<h2 id="tech">Built with, and without</h2>
+<ul>
+  <li><b>With:</b> plain HTML, CSS and JavaScript; the Web Audio API (<code>AudioWorklet</code> where
+    available, with a main-thread fallback); canvas for the graph, meters, spectrum and phase wheel.</li>
+  <li><b>Without:</b> no frameworks, no build step at runtime, no CDNs, no external fonts, no analytics, no
+    accounts, no cookies, no server-side processing of anything you do here. The share links encode a session
+    in the URL fragment, which browsers never send to a server.</li>
+  <li><b>Privacy, plainly:</b> your sessions, favourites and skin choice live in your browser's local storage
+    and nowhere else. Nothing is transmitted anywhere, ever.</li>
+</ul>
+
+<h2 id="colophon">Colophon</h2>
+<p>Written for this site. The library and the help pages are generated and checked by build scripts, so the
+numbers in the prose are the numbers the audio engine plays. Pack archives are byte-deterministic. The site is
+tested headlessly — synthesis, file parsing and packing all have Node test suites, and the page itself is
+driven by a browser harness before anything ships.</p>
+<p class="small">Licence texts: <a href="../app/COPYING">COPYING</a> (GPL-2.0-or-later) ·
+<a href="../app/COPYING.LESSER">COPYING.LESSER</a> (LGPL-2.1-or-later, the engine) ·
+<a href="../app/NOTICE.txt">NOTICE.txt</a> · <a href="https://moddys.net/">moddys.net</a> (attribution and provenance, authoritative).</p>
+
+</main>
+
+<footer class="site">
+  <div class="shell">
+    <p><a href="../">Resonance Studio</a> · <a href="../app/">Studio</a> · <a href="../help/">Help</a> ·
+      <a href="../packs/">Packs</a> · <a href="../help/evidence.html">Evidence</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  try {
+    var prefs = JSON.parse(localStorage.getItem("resonance.prefs.v1") || "{}");
+    if (prefs.skin) document.documentElement.setAttribute("data-skin", prefs.skin);
+    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches)
+      document.documentElement.setAttribute("data-skin", "paper");
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
