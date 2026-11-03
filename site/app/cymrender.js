@@ -444,13 +444,13 @@ void main() {
             var i1 = Math.min(n - 1, i + 1), j1 = Math.min(n - 1, j + 1);
             var dx = h[i1 * n + j] * st.amp - hv, dy = h[i * n + j1] * st.amp - hv;
             var nz = 1 / Math.sqrt(dx * dx + dy * dy + 0.02);
-            var lit = 0.16 + 0.56 * Math.max(0, (-dx * 0.5 + -dy * 0.4 + 0.8) * nz);
+            var lit = 0.10 + 0.40 * Math.max(0, Math.min(1, (-dx * 0.5 - dy * 0.4 + 0.8) * nz * 0.20));
             var env = e ? e[k] : 0;
             var line = Math.max(0, 1 - env / 0.06);
             var o = k * 4;
-            d[o] = 255 * Math.min(1, pal.base[0] * lit + pal.line[0] * line * 0.8);
-            d[o + 1] = 255 * Math.min(1, pal.base[1] * lit + pal.line[1] * line * 0.8);
-            d[o + 2] = 255 * Math.min(1, pal.base[2] * lit + pal.line[2] * line * 0.8);
+            d[o] = 255 * Math.min(1, pal.base[0] * lit * 0.9 + pal.line[0] * line * 0.65);
+            d[o + 1] = 255 * Math.min(1, pal.base[1] * lit * 0.9 + pal.line[1] * line * 0.65);
+            d[o + 2] = 255 * Math.min(1, pal.base[2] * lit * 0.9 + pal.line[2] * line * 0.65);
             d[o + 3] = 255;
           }
         }

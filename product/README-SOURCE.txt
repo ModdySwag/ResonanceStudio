@@ -1,7 +1,7 @@
-Resonance Studio 1.0a - source and licences
+Resonance Studio 1.0b - source and licences
 =========================================
 
-This package is the corresponding source for the Resonance Studio 1.0a Windows build, as offered
+This package is the corresponding source for the Resonance Studio 1.0b Windows build, as offered
 at moddys.net/moddys-downloads.html and on GitHub.
 
 THE APPLICATION
@@ -21,7 +21,7 @@ LAYOUT
   site/            the web application source (app/, help/, packs/, credits/, landing, site.css)
   windows/         the Windows packaging project (shell, installer, tools, verification, version.json)
   product/         this file
-  README.md, RELEASE-NOTES-1.0a.md, COPYING, COPYING.LESSER, NOTICE.txt
+  README.md, RELEASE-NOTES-1.0b.md, COPYING, COPYING.LESSER, NOTICE.txt
 
 BUILDING
 --------
@@ -30,11 +30,11 @@ BUILDING
   py -3.11 windows/tools/build_windows.py      # verifies the pin, stages Electron, compiles the Setup
   py -3.11 windows/tools/install_journey.py    # install -> desktop suite -> upgrade -> uninstall
 
-HASH LEDGER (built 2026-09-28 22:23)
+HASH LEDGER (built 2026-11-04 09:36)
 ----------
-  93310403af600c95f15dcc7a6219d64be2c32b0ee304250a91daa78322430faa  ResonanceStudio-Setup-1.0a.exe
-  66e11a71257ea7cabe0ac7789aa14da8b6de485af560fd803f879913afd8c591  ResonanceStudio-Setup-1.0a.exe.zip  (the file the downloads page serves)
-  5b838c82520d3681e52e71ca6a9c420eba1f71c3b29ac0aa4999cff24b0867d4  frozen app tree rollup (build 5b838c82, 43 files, 791,037 bytes)
+  f2d180c8f0d7d74cda737832a12edd335965ba047497b8c4821cc2ca2576be37  ResonanceStudio-Setup-1.0b.exe
+  78aae9fce26d832ffeeed2a337d79669c33861b276f87e40aa791be01653eaa2  ResonanceStudio-Setup-1.0b.exe.zip  (the file the downloads page serves)
+  8383d8f334dae0d239bfdff634f18ef1ac43cd6b3d864ea3280e579d1ef7900b  frozen app tree rollup (build 8383d8f3, 56 files, 2,098,961 bytes)
 
 The installed program at %LOCALAPPDATA%\Programs\Resonance Studio carries exactly that frozen
 tree under resources/app — the install journey re-hashes every file to prove it.

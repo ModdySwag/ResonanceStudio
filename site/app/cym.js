@@ -49,7 +49,7 @@
   var lastF0 = 0;
   var ana = { nearest: 0, detune: 0, peak: 0 };   /* persists between weight updates */
   var cursors = [], cursorVoices = null, beatPh = [];
-  var dirtyField = true, resizeT = 0, lastMediumKey = "", lastWaterBuild = 0;
+  var dirtyField = true, resizeT = 0, lastMediumKey = "", lastWaterBuild = 0, lastResizeT = 0;
 
   /* ==================================================================== *
    * medium construction
@@ -209,6 +209,13 @@
       field = new F.Field(medium, 256);
       dirtyField = true;
       refreshPhysics();
+    }
+
+    /* The overlay is built while hidden, so its canvas can be sized 1x1 and
+     * never recover (the Android WebView does exactly this). Re-check the box. */
+    if (t - lastResizeT > 0.5 && Math.abs((renderer.W || 0) - root.clientWidth) > 1) {
+      lastResizeT = t;
+      resize(false);
     }
 
     var rate = a.rate > 0 ? Math.min(a.rate, 1) : 0.12;      /* visible modulation cap */
@@ -387,6 +394,8 @@
     root.hidden = true;
 
     canvas = el("canvas", "cym-canvas", root);
+    var scrim = el("div", "cym-scrim", root);
+    scrim.id = "cymScrim";
     canvas.width = 2; canvas.height = 2;
     el("div", "cym-vignette", root);
 
@@ -397,6 +406,8 @@
       "<p class='cym-tone'><b id='cymTone'>—</b></p>");
     var act = el("div", "cym-actions", top);
     el("span", "cym-live", act, "<i></i> live");
+    var ctl = el("button", "cym-ctl", act, "Controls");
+    ctl.id = "cymCtl"; ctl.title = "show the controls";
     var pb = el("button", "cym-play", act, "&#9654;");
     pb.id = "cymPlay"; pb.title = "play / pause the session";
     var cb = el("button", "cym-close", act, "Close");
@@ -465,6 +476,15 @@
 
   function wire() {
     $("cymClose").onclick = close;
+    $("cymCtl").onclick = function () {
+      var openNow = !$("cymRoot").querySelector(".cym-left").classList.contains("open");
+      $("cymRoot").querySelector(".cym-left").classList.toggle("open", openNow);
+      $("cymScrim").classList.toggle("on", openNow);
+    };
+    $("cymScrim").onclick = function () {
+      $("cymRoot").querySelector(".cym-left").classList.remove("open");
+      $("cymScrim").classList.remove("on");
+    };
     $("cymPlay").onclick = function () {
       var api = window.__gnauralAPI;
       if (api && api.togglePlay) api.togglePlay();
@@ -636,6 +656,9 @@
       var api = window.__gnauralAPI;
       if (api && api.state && !api.state.playing && api.play) { /* leave transport alone */ }
     }
+    var L = root.querySelector(".cym-left");
+    if (L) L.classList.remove("open");
+    if ($("cymScrim")) $("cymScrim").classList.remove("on");
     if ($("cymClose")) $("cymClose").focus();
     try { history.replaceState(null, "", "#cymatics"); } catch (e) {}
   }

@@ -12,7 +12,7 @@ and its corresponding source.
 **Designed, built and maintained by Modtech** (a.k.a. **Moddy**).
 
 - Live app: **https://moddys.net/resonance/** (free, in the browser — runs entirely in the page)
-- Windows app: **the 1.0a beta** — download the installer from
+- Windows app: **the 1.0b beta** — download the installer from
   [moddys.net/moddys-downloads.html](https://moddys.net/moddys-downloads.html) or
   [Releases](https://github.com/ModdySwag/ResonanceStudio/releases); each build ships with its
   corresponding source.
