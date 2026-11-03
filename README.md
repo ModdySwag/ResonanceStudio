@@ -1,5 +1,9 @@
 # Resonance Studio — a tone, beat and noise studio (Gnaural Web)
 
+[![Licence: GPL-2.0](https://img.shields.io/badge/licence-GPL-2.0-0E8C7C?style=flat-square)](COPYING)
+![Platform: Windows · web](https://img.shields.io/badge/platform-Windows%20%C2%B7%20web-0A7A6C?style=flat-square)
+[![Latest release](https://img.shields.io/github/v/release/ModdySwag/ResonanceStudio?color=FFB86B&label=release&style=flat-square)](https://github.com/ModdySwag/ResonanceStudio/releases)
+
 Binaural beats, monaural beats, isochronic pulses and noise beds, with **124 ready sessions in
 18 packs** and a real schedule editor — a browser re-implementation of Gnaural's scheduling engine
 and `.gnaural` format, written for moddys.net. This repository holds the Windows desktop build
