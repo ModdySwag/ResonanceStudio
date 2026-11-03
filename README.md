@@ -34,8 +34,22 @@ The Windows build, captured from the app itself:
 ![Resonance Studio — timer, breathing pacer, the pack downloads and an inline visualizer card](screenshots/resonance-tools.jpg)
 ![Resonance Studio — save, WAV export and share; voices and entries in the right column](screenshots/resonance-files.jpg)
 
+## The Cymatic Chamber
+
+A dedicated instrument behind the ambient visualizer panels. It takes the session's own carrier and
+beat, solves the vibration modes of a real plate, and draws the figure that tone actually drives —
+sand collects on the nodal lines. Six media, each solved rather than painted: a free steel plate
+(Rayleigh–Ritz, Leissa's frequencies), the classical centre-bolted plate, a clamped disc (Bessel
+modes), a circular drum, Faraday waves on water (the true gravity–capillary wavelength at half the
+drive), and bubble acoustics (Minnaert resonance and Bjerknes forces). The mode ladder drives any
+mode exactly; the readout gives the nearest mode and the detuning in cents.
+
+![The Cymatic Chamber — a free steel plate driven at the session's tone, with the sand collected on the nodal lines](screenshots/resonance-cymatics.jpg)
+
 ## What it does
 
+- **The tone made visible.** The Cymatic Chamber solves a real plate's modes and shows the figure
+  the tone drives — with a mode ladder, a detuning readout and the physics numbers behind it.
 - **Six voice types.** Binaural pairs (two tones, one per ear), monaural beats (two tones in both
   ears, beating in the room), isochronic pulses (one carrier switched on and off —
   speaker-friendly), and pink, brown and white noise beds. Stack any of them.
