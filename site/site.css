@@ -89,6 +89,12 @@ footer.site a { color: var(--ink-dim); }
 .card p:last-child { margin-bottom: 0; }
 .card .tag { font-family: var(--mono); font-size: .74rem; color: var(--ink-faint); letter-spacing: .08em; text-transform: uppercase; }
 
+/* the landing page's screenshot gallery */
+.shots { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); margin-top: 18px; }
+.shots figure { margin: 0; padding: 0; overflow: hidden; }
+.shots img { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--line); }
+.shots figcaption { padding: 10px 14px 12px; font-size: .88rem; color: var(--ink-dim); }
+
 .callout {
   border-left: 3px solid var(--acc); background: color-mix(in srgb, var(--acc) 7%, transparent);
   padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 18px 0;

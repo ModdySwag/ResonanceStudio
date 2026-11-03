@@ -1,0 +1,209 @@
+/* Resonance Studio — Cymatic Chamber.
+ * Licensed GPL-2.0-or-later (see NOTICE.txt).
+ *
+ * A full-viewport instrument layer over the studio. Panels are dark glass so
+ * the plate is the brightest thing on screen; accents come from the skin.
+ */
+
+html.cym-open, html.cym-open body { overflow: hidden; }
+
+.cym {
+  position: fixed; inset: 0; z-index: 70;
+  background: #0a0806;
+  color: var(--ink);
+  font: 14px/1.45 var(--sans);
+  overflow: hidden;
+  animation: cym-in .32s ease both;
+}
+@keyframes cym-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cym { animation: none; } }
+
+.cym-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: block; cursor: grab; touch-action: none;
+}
+.cym-canvas:active { cursor: grabbing; }
+
+.cym-vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 42%, transparent 40%, rgba(0,0,0,.55) 100%),
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, transparent 18%, transparent 78%, rgba(0,0,0,.65) 100%);
+}
+
+/* ------------------------------------------------------------------ top */
+.cym-top {
+  position: absolute; left: 0; right: 0; top: 0;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 22px; gap: 18px; pointer-events: none;
+}
+.cym-brand, .cym-actions { pointer-events: auto; }
+.cym-kicker {
+  display: block; font-size: .64rem; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--ink-faint); margin-bottom: 2px;
+}
+.cym-brand h1 {
+  margin: 0; font: italic 600 1.62rem/1.05 "Palatino Linotype", Palatino, Georgia, serif;
+  letter-spacing: .01em;
+  background: linear-gradient(180deg, #f8ecd2 10%, #dfbd7c 58%, #a98243 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cym-tone { margin: 5px 0 0; font-family: var(--mono); font-size: .78rem; color: var(--ink-dim); }
+.cym-tone b { color: var(--acc); font-weight: 600; }
+.cym-actions { display: flex; align-items: center; gap: 8px; }
+.cym-live {
+  display: inline-flex; align-items: center; gap: 6px; font-size: .68rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-faint);
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 10px;
+}
+.cym-live i {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--good);
+  box-shadow: 0 0 8px var(--good); animation: cym-pulse 2.4s ease-in-out infinite;
+}
+@keyframes cym-pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cym-live i { animation: none; opacity: 1; } }
+.cym-play, .cym-close {
+  background: rgba(24,19,14,.72); border: 1px solid var(--line2); color: var(--ink);
+  border-radius: 9px; padding: 7px 12px; cursor: pointer;
+}
+.cym-play { width: 38px; height: 38px; padding: 0; font-size: 14px; }
+.cym-play:hover, .cym-close:hover { border-color: var(--acc); color: var(--acc2); }
+
+/* --------------------------------------------------------------- panels */
+.cym-panel {
+  position: absolute; top: 96px; bottom: 84px; width: 286px;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 14px; overflow-y: auto; overscroll-behavior: contain;
+  background: linear-gradient(180deg, rgba(26,20,14,.86), rgba(12,9,7,.92));
+  border: 1px solid rgba(224,185,111,.20); border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter: blur(16px) saturate(120%);
+  scrollbar-width: thin; scrollbar-color: var(--line2) transparent;
+}
+.cym-left { left: 18px; }
+.cym-right { right: 18px; width: 268px; }
+.cym-panel::-webkit-scrollbar { width: 8px; }
+.cym-panel::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 8px; }
+
+.cym-sec { border-bottom: 1px solid rgba(224,185,111,.10); padding-bottom: 12px; }
+.cym-sec:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.cym-sec h4 {
+  margin: 0 0 8px; font-size: .66rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 600;
+}
+.cym-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.cym-btns button {
+  background: rgba(38,29,21,.65); border: 1px solid var(--line); color: var(--ink-dim);
+  border-radius: 8px; padding: 7px 8px; font-size: .78rem; cursor: pointer; text-align: center;
+}
+.cym-btns button:hover { border-color: var(--acc); color: var(--ink); }
+.cym-btns button.on {
+  border-color: var(--acc); color: var(--acc2);
+  background: linear-gradient(180deg, rgba(224,185,111,.20), rgba(224,185,111,.07));
+  box-shadow: 0 0 0 1px rgba(224,185,111,.18) inset;
+}
+.cym-row {
+  display: flex; align-items: center; gap: 8px; margin: 7px 0; font-size: .76rem; color: var(--ink-dim);
+}
+.cym-row select {
+  margin-left: auto; background: rgba(38,29,21,.8); border: 1px solid var(--line);
+  color: var(--ink); border-radius: 7px; padding: 5px 7px; font-size: .76rem;
+}
+.cym-row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--acc); }
+.cym-row b {
+  min-width: 52px; text-align: right; font-family: var(--mono); font-size: .7rem;
+  color: var(--ink); font-weight: 500;
+}
+.cym-note { margin: 8px 0 0; font-size: .7rem; line-height: 1.5; color: var(--ink-faint); }
+
+.cym-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.cym-chip {
+  font-size: .64rem; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px 9px;
+  color: var(--ink-faint); cursor: pointer; user-select: none;
+}
+.cym-chip:hover { border-color: var(--acc); color: var(--ink); }
+.cym-chip.on { border-color: var(--acc); color: var(--acc2); background: rgba(224,185,111,.14); }
+.cym-check {
+  display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: .76rem; color: var(--ink-dim);
+}
+.cym-check input { accent-color: var(--acc); }
+
+/* --------------------------------------------------------------- readout */
+.cym-readout {
+  padding: 12px 12px 14px; border-radius: 12px;
+  background: radial-gradient(120% 120% at 20% 0%, rgba(224,185,111,.12), transparent 60%);
+  border: 1px solid rgba(224,185,111,.14);
+}
+.cym-mode {
+  font: italic 600 1.32rem/1.15 "Palatino Linotype", Palatino, Georgia, serif; color: var(--acc2);
+}
+.cym-modef { font-family: var(--mono); font-size: .95rem; color: var(--ink); margin-top: 3px; }
+.cym-detune { font-size: .72rem; color: var(--ink-faint); margin-top: 5px; letter-spacing: .04em; }
+.cym-detune.ok { color: var(--good); }
+
+.cym-bar {
+  display: grid; grid-template-columns: 1fr 64px 34px; align-items: center; gap: 7px;
+  font-size: .68rem; color: var(--ink-dim); margin: 5px 0;
+}
+.cym-bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cym-bar i {
+  display: block; height: 4px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--acc), var(--acc2)); opacity: .85;
+}
+.cym-bar b { font-family: var(--mono); font-size: .64rem; text-align: right; color: var(--ink-faint); font-weight: 500; }
+
+.cym-panel dl {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0;
+  font-size: .7rem;
+}
+.cym-panel dt { color: var(--ink-faint); letter-spacing: .05em; }
+.cym-panel dd { margin: 0; color: var(--ink-dim); text-align: right; font-family: var(--mono); font-size: .66rem; }
+.cym-stats { margin: 10px 0 0; font-family: var(--mono); font-size: .62rem; color: var(--ink-faint); }
+
+/* ----------------------------------------------------------------- dock */
+.cym-dock {
+  position: absolute; left: 322px; right: 304px; bottom: 16px;
+  padding: 10px 14px 8px; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(26,20,14,.82), rgba(12,9,7,.9));
+  border: 1px solid rgba(224,185,111,.16); backdrop-filter: blur(14px);
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+.cym-ladder {
+  position: relative; height: 30px; margin: 0 46px;
+  border-bottom: 1px solid var(--line);
+}
+.cym-tick {
+  position: absolute; bottom: 0; width: 1px; height: 9px; background: var(--line2);
+  cursor: pointer; transform: translateX(-.5px);
+}
+.cym-tick:hover { background: var(--acc2); height: 16px; box-shadow: 0 0 8px var(--acc); }
+.cym-marker {
+  position: absolute; bottom: -1px; width: 2px; height: 22px; margin-left: -1px;
+  background: linear-gradient(180deg, var(--acc2), var(--acc));
+  box-shadow: 0 0 10px var(--acc); transition: left .12s linear;
+}
+.cym-dock-lo, .cym-dock-hi {
+  position: absolute; bottom: 12px; font-family: var(--mono); font-size: .62rem; color: var(--ink-faint);
+}
+.cym-dock-lo { left: 14px; }
+.cym-dock-hi { right: 14px; }
+.cym-hint {
+  margin: 7px 0 0; text-align: center; font-size: .66rem; color: var(--ink-faint);
+}
+
+/* ----------------------------------------------------------- responsive */
+@media (max-width: 1180px) {
+  .cym-right { display: none; }
+  .cym-dock { right: 18px; }
+}
+@media (max-width: 820px) {
+  .cym-panel { top: auto; bottom: 92px; width: 240px; max-height: 44vh; }
+  .cym-left { left: 10px; }
+  .cym-dock { left: 10px; right: 10px; }
+  .cym-brand h1 { font-size: 1.25rem; }
+  .cym-top { padding: 12px; }
+}
+
+/* print / capture: no chrome */
+.cym.cym-capture .cym-top, .cym.cym-capture .cym-panel, .cym.cym-capture .cym-dock { display: none; }
