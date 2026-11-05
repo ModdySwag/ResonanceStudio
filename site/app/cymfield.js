@@ -458,6 +458,180 @@
   }
 
   /* ==================================================================== *
+   * Airborne dust
+   * ==================================================================== */
+
+  /* The site-effect vocabulary (emitter, turbulence, decay, gravity, settle,
+   * sparkle) mapped onto the driven plate. Dust is a MODEL of aerosol
+   * transport, not a solved acoustic force: grains are lifted where the plate
+   * moves most, blown along the envelope gradient toward the nodal set, and
+   * settle there when the drive falls. The numbers below are the whole mapping
+   * - nothing else carries a magic constant.
+   *
+   * grav is +down. Bubbles float (negative), water sprays and falls hard. */
+  var DUST_MAP = {
+    lift: 1.35,          /* upward throw, x drive x local envelope */
+    drift: 4.2,          /* accel along -grad(env^2) x drive (toward nodes) */
+    turb: 0.22,          /* random accel, scaled up in nodal regions */
+    dragPlate: 0.85,
+    dragWater: 0.42,
+    gravPlate: 0.45,     /* a quiet plate has to beat lift so grains commit */
+    gravWater: 1.10,
+    gravBubbles: -0.30,
+    maxSpeed: 2.4,
+    launch: 0.36,        /* upward kick at respawn (x drive is added by lift) */
+    launchWater: 0.95,
+    settleRate: 1.6,
+    releaseRate: 2.2,
+    setAt: 0.55,
+    decayMin: 0.06,      /* a grain lives 2.8-16 s, so it can actually travel */
+    decaySpan: 0.30,
+    ceiling: 2.20,
+    rim: 1.15            /* grains may drift past the plate edge and fade out */
+  };
+
+  function Dust(count, seed) {
+    this.n = count || 4000;
+    this.x = new Float32Array(this.n);
+    this.y = new Float32Array(this.n);
+    this.z = new Float32Array(this.n);
+    this.vx = new Float32Array(this.n);
+    this.vy = new Float32Array(this.n);
+    this.vz = new Float32Array(this.n);
+    this.life = new Float32Array(this.n);
+    this.size = new Float32Array(this.n);
+    this.set = new Float32Array(this.n);
+    this.dwell = new Float32Array(this.n);
+    this.rng = mulberry32(seed === undefined ? 7654321 : seed);
+    this.maxY = DUST_MAP.ceiling;
+    this.reset();
+  }
+
+  /* Lift a grain at an antinode: a few candidates, keep the busiest. This is
+   * the emitter-position idea, chosen by the field instead of by a pointer. */
+  Dust.prototype.emit = function (field, i) {
+    var bu = this.rng() * 2 - 1, bv = this.rng() * 2 - 1, best = field.envAt(bu, bv);
+    if (this.rng() > 0.30) {
+      for (var k = 0; k < 4; k++) {
+        var u = this.rng() * 2 - 1, v = this.rng() * 2 - 1, e = field.envAt(u, v);
+        if (e > best) { best = e; bu = u; bv = v; }
+      }
+    }
+    if (field.medium.geometry === "circle") {
+      var r = Math.hypot(bu, bv) || 1;
+      if (r > 0.97) { bu *= 0.97 / r; bv *= 0.97 / r; }
+    }
+    this.x[i] = bu; this.y[i] = bv;
+    /* bias the column high: grains that spawn on the surface merge into a fog
+     * patch, so most start already airborne. 30 % skip the antinode search so
+     * the whole plate gets some dust, not just the loud lobe. */
+    this.z[i] = 0.05 + Math.pow(this.rng(), 0.7) * 0.8;
+    this.vx[i] = 0; this.vy[i] = 0; this.vz[i] = 0.02 + this.rng() * 0.05;
+    this.life[i] = this.rng() * 0.55;
+    this.size[i] = 0.5 + this.rng() * 1.3;
+    this.set[i] = 0;
+    this.dwell[i] = 0;
+  };
+
+  /* reset() seeds from the live field when it has one, so the first frame is
+   * already biased to the antinodes rather than uniform noise */
+  Dust.prototype.reset = function (field) {
+    var stub = { envAt: function () { return 0.5; }, medium: { geometry: "square" } };
+    var src = field || stub;
+    for (var i = 0; i < this.n; i++) {
+      this.emit(src, i);
+      if (field) this.z[i] = this.rng() * this.maxY;
+      this.life[i] = this.rng();
+    }
+  };
+
+  Dust.prototype.step = function (field, dt, drive, opts) {
+    opts = opts || {};
+    var circle = field.medium.geometry === "circle";
+    var grav = opts.grav === undefined ? DUST_MAP.gravPlate : opts.grav;
+    var drag = opts.drag === undefined ? DUST_MAP.dragPlate : opts.drag;
+    var lift = (opts.lift === undefined ? DUST_MAP.lift : opts.lift) * drive;
+    var decay = DUST_MAP.decayMin + DUST_MAP.decaySpan * drive;
+    var g = [0, 0];
+    var dtc = Math.min(dt, 1 / 30);
+
+    for (var i = 0; i < this.n; i++) {
+      this.life[i] += decay * dtc;
+      if (this.life[i] >= 1) {
+        this.emit(field, i);
+        this.vz[i] = (opts.launch === undefined ? DUST_MAP.launch : opts.launch) * (0.5 + this.rng());
+        continue;
+      }
+
+      var u = this.x[i], v = this.y[i];
+      var env = field.envAt(u, v);
+      /* Release a settled grain only when the plate really moves here. */
+      if (this.set[i] > 0) {
+        this.set[i] -= DUST_MAP.releaseRate * drive * (0.35 + env) * dtc;
+        if (this.set[i] <= 0) { this.set[i] = 0; this.dwell[i] = 0; this.vz[i] = 0.05; }
+      }
+
+      field.gradEnv2(u, v, g);
+      /* turbulence is strongest over the nodal set (env ~ 0), where the plate
+       * is still; over an antinode the air is comparatively calm */
+      var turb = DUST_MAP.turb * (0.35 + (1 - env)) * (0.3 + drive);
+      var ax = (-g[0] * DUST_MAP.drift * drive + (this.rng() - 0.5) * turb) * dtc;
+      var ay = (-g[1] * DUST_MAP.drift * drive + (this.rng() - 0.5) * turb) * dtc;
+      var az = (-grav * (1 - drive * 0.55) +
+        lift * (env * 1.6 + 0.2) + (this.rng() - 0.5) * turb) * dtc;
+
+      if (this.set[i] > DUST_MAP.setAt) {
+        /* settled: hold position, only a little shiver */
+        this.x[i] += Math.sin(this.life[i] * 40 + i) * 0.0006;
+        this.y[i] += Math.cos(this.life[i] * 37 + i) * 0.0006;
+        continue;
+      }
+
+      this.vx[i] = (this.vx[i] + ax) * (1 - Math.min(0.9, drag * dtc));
+      this.vy[i] = (this.vy[i] + ay) * (1 - Math.min(0.9, drag * dtc));
+      this.vz[i] = (this.vz[i] + az) * (1 - Math.min(0.9, drag * dtc));
+      var sp = Math.hypot(this.vx[i], this.vy[i], this.vz[i]);
+      if (sp > DUST_MAP.maxSpeed) {
+        var k = DUST_MAP.maxSpeed / sp;
+        this.vx[i] *= k; this.vy[i] *= k; this.vz[i] *= k;
+      }
+      this.x[i] += this.vx[i] * dtc;
+      this.y[i] += this.vy[i] * dtc;
+      this.z[i] += this.vz[i] * dtc;
+
+      /* the plate is the floor. A grain that rests here for a moment SETS: the
+       * dwell timer is what stops turbulence (which never goes to zero) from
+       * re-throwing every grain forever, and the speed term only decides how
+       * fast a resting grain sticks. The band is 0.02 because a settling grain
+       * lifts a hair off the surface on every bounce - testing the exact floor
+       * height zeroed the timer each frame and nothing ever settled. */
+      if (this.z[i] <= 0.02) {
+        if (this.z[i] <= 0.006) {
+          this.z[i] = 0.006;
+          this.vz[i] = Math.abs(this.vz[i]) * 0.12;
+          this.vx[i] *= 0.7; this.vy[i] *= 0.7;
+        }
+        this.dwell[i] += dtc;
+        if (this.dwell[i] > 0.35) {
+          this.set[i] += DUST_MAP.settleRate * dtc * (1 - Math.min(1, sp / DUST_MAP.maxSpeed));
+        }
+      } else {
+        this.dwell[i] = Math.max(0, this.dwell[i] - dtc * 2);
+      }
+      if (this.z[i] > this.maxY) { this.z[i] = this.maxY; this.vz[i] = -Math.abs(this.vz[i]) * 0.3; }
+
+      if (this.x[i] > DUST_MAP.rim) { this.x[i] = DUST_MAP.rim; this.vx[i] *= -0.3; }
+      if (this.x[i] < -DUST_MAP.rim) { this.x[i] = -DUST_MAP.rim; this.vx[i] *= -0.3; }
+      if (this.y[i] > DUST_MAP.rim) { this.y[i] = DUST_MAP.rim; this.vy[i] *= -0.3; }
+      if (this.y[i] < -DUST_MAP.rim) { this.y[i] = -DUST_MAP.rim; this.vy[i] *= -0.3; }
+      if (circle && this.x[i] * this.x[i] + this.y[i] * this.y[i] > DUST_MAP.rim * DUST_MAP.rim) {
+        var r2 = Math.hypot(this.x[i], this.y[i]) || 1;
+        this.x[i] *= DUST_MAP.rim / r2; this.y[i] *= DUST_MAP.rim / r2;
+      }
+    }
+  };
+
+  /* ==================================================================== *
    * utilities
    * ==================================================================== */
 
@@ -475,7 +649,7 @@
 
   globalThis.GnauralCymField = {
     version: 1,
-    Field: Field, Sand: Sand, Bubbles: Bubbles,
+    Field: Field, Sand: Sand, Bubbles: Bubbles, Dust: Dust, DUST_MAP: DUST_MAP,
     waterMedium: waterMedium, waterWeights: waterWeights,
     ritzGrid: ritzGrid, boltedGrid: boltedGrid, circularGrid: circularGrid, planeGrid: planeGrid,
     MINNAERT_K: MINNAERT_K, bubbleQ: bubbleQ,

@@ -608,20 +608,27 @@
   Ripples.prototype.draw = function (F) {
     var s = this.s, ctx = F.ctx, W = F.W, H = F.H;
     var v = pulseVoice(F);
+    function spawn(a) {
+      if (s.rings.length >= 7) return;
+      s.rings.push({
+        t0: F.t,
+        x: W * (0.30 + 0.40 * ((s.jx + s.rings.length * 0.37) % 1)),
+        y: H * (0.24 + 0.5 * ((s.jy + s.rings.length * 0.61) % 1)),
+        s: 0.045 + 0.10 * ((s.jx * 7 + s.rings.length) % 1),
+        a: a
+      });
+    }
     if (v) {
       var events = (v.kind === "binaural") ? v.env.wraps : v.gate.openings;
       var n = (v.kind === "binaural") ? Math.max(1, v.env.N) : Math.max(1, v.gate.N);
       if (events - s.lastOpen >= n && s.rings.length < 7) {
         s.lastOpen = events - (events - s.lastOpen) % n;
-        s.rings.push({
-          t0: F.t,
-          x: W * (0.30 + 0.40 * ((s.jx + s.rings.length * 0.37) % 1)),
-          y: H * (0.24 + 0.5 * ((s.jy + s.rings.length * 0.61) % 1)),
-          s: 0.045 + 0.10 * ((s.jx * 7 + s.rings.length) % 1),
-          a: 0.10 + 0.14 * clamp(v.att, 0, 1)
-        });
+        spawn(0.10 + 0.14 * clamp(v.att, 0, 1));
       }
     }
+    /* Never open blank: on a heavily slowed session the first gate event can be
+     * a minute away, and a backdrop-less ripple panel would show nothing. */
+    if (!s.rings.length) spawn(0.12);
     ctx.save();
     for (var i = s.rings.length - 1; i >= 0; i--) {
       var r0 = s.rings[i];

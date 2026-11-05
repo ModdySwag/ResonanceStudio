@@ -89,7 +89,7 @@ html.cym-open, html.cym-open body { overflow: hidden; }
 .cym-sec:last-of-type { border-bottom: 0; padding-bottom: 0; }
 .cym-sec h4 {
   margin: 0 0 8px; font-size: .66rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--ink-faint); font-weight: 600;
+  color: var(--ink-dim); font-weight: 600;
 }
 .cym-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .cym-btns button {
@@ -114,7 +114,24 @@ html.cym-open, html.cym-open body { overflow: hidden; }
   min-width: 52px; text-align: right; font-family: var(--mono); font-size: .7rem;
   color: var(--ink); font-weight: 500;
 }
-.cym-note { margin: 8px 0 0; font-size: .7rem; line-height: 1.5; color: var(--ink-faint); }
+.cym-note { margin: 8px 0 0; font-size: .72rem; line-height: 1.55; color: var(--ink-dim); }
+
+/* scene picker: prev / select / next, shuffle underneath */
+.cym-scenes { display: grid; grid-template-columns: 26px 1fr 26px; gap: 6px; align-items: center; }
+.cym-scenes select {
+  background: rgba(38,29,21,.8); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 8px; padding: 7px 8px; font-size: .78rem; min-width: 0;
+}
+.cym-scenes button {
+  background: rgba(38,29,21,.65); border: 1px solid var(--line); color: var(--ink-dim);
+  border-radius: 8px; padding: 7px 0; font-size: .9rem; cursor: pointer; line-height: 1;
+}
+.cym-scenes button:hover { border-color: var(--acc); color: var(--ink); }
+#cymShuffle {
+  grid-column: 1 / -1; font-size: .7rem; letter-spacing: .09em; text-transform: uppercase;
+  padding: 6px 0; color: var(--ink-faint);
+}
+#cymShuffle:hover { color: var(--acc2); }
 
 .cym-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .cym-chip {

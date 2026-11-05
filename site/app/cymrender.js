@@ -17,9 +17,31 @@
     copper:    { bg: [0.035, 0.022, 0.018], base: [0.55, 0.28, 0.16], line: [1.0, 0.60, 0.34], sand: [1.0, 0.88, 0.76], rim: [1.0, 0.55, 0.28] },
     verdigris: { bg: [0.018, 0.032, 0.030], base: [0.20, 0.44, 0.38], line: [0.55, 1.0, 0.86], sand: [0.88, 1.0, 0.96], rim: [0.35, 0.95, 0.78] },
     ice:       { bg: [0.020, 0.026, 0.038], base: [0.40, 0.46, 0.58], line: [0.80, 0.90, 1.0], sand: [0.94, 0.97, 1.0], rim: [0.70, 0.85, 1.0] },
-    mono:      { bg: [0.030, 0.030, 0.032], base: [0.46, 0.46, 0.47], line: [0.98, 0.98, 0.98], sand: [0.92, 0.92, 0.90], rim: [0.85, 0.85, 0.85] }
+    mono:      { bg: [0.030, 0.030, 0.032], base: [0.46, 0.46, 0.47], line: [0.98, 0.98, 0.98], sand: [0.92, 0.92, 0.90], rim: [0.85, 0.85, 0.85] },
+    /* saturated set: the "pop" palettes. Still dark fields, hot lines. */
+    ember:     { bg: [0.040, 0.014, 0.010], base: [0.62, 0.18, 0.09], line: [1.0, 0.62, 0.22], sand: [1.0, 0.90, 0.72], rim: [1.0, 0.44, 0.14] },
+    magma:     { bg: [0.034, 0.012, 0.026], base: [0.58, 0.14, 0.26], line: [1.0, 0.42, 0.52], sand: [1.0, 0.86, 0.84], rim: [1.0, 0.24, 0.44] },
+    orchid:    { bg: [0.026, 0.014, 0.040], base: [0.42, 0.20, 0.62], line: [0.86, 0.52, 1.0], sand: [0.96, 0.90, 1.0], rim: [0.78, 0.32, 1.0] },
+    ultraviolet: { bg: [0.016, 0.012, 0.042], base: [0.28, 0.22, 0.72], line: [0.56, 0.48, 1.0], sand: [0.90, 0.88, 1.0], rim: [0.42, 0.24, 1.0] },
+    toxic:     { bg: [0.014, 0.032, 0.016], base: [0.20, 0.46, 0.18], line: [0.52, 0.92, 0.26], sand: [0.90, 1.0, 0.78], rim: [0.36, 0.86, 0.14] },
+    candy:     { bg: [0.030, 0.016, 0.030], base: [0.62, 0.24, 0.52], line: [1.0, 0.60, 0.86], sand: [1.0, 0.92, 0.98], rim: [1.0, 0.40, 0.72] },
+    aurora:    { bg: [0.012, 0.026, 0.030], base: [0.16, 0.50, 0.50], line: [0.42, 1.0, 0.84], sand: [0.84, 1.0, 0.94], rim: [0.20, 0.96, 0.72] },
+    solar:     { bg: [0.038, 0.028, 0.008], base: [0.66, 0.52, 0.10], line: [1.0, 0.88, 0.34], sand: [1.0, 0.97, 0.78], rim: [1.0, 0.78, 0.14] },
+    neon:      { bg: [0.012, 0.020, 0.036], base: [0.16, 0.36, 0.70], line: [0.44, 0.74, 1.0], sand: [0.86, 0.94, 1.0], rim: [0.22, 0.62, 1.0] },
+    blood:     { bg: [0.030, 0.010, 0.012], base: [0.54, 0.10, 0.14], line: [1.0, 0.34, 0.36], sand: [1.0, 0.84, 0.82], rim: [0.92, 0.14, 0.20] },
+    lagoon:    { bg: [0.010, 0.028, 0.030], base: [0.10, 0.48, 0.50], line: [0.34, 0.94, 0.96], sand: [0.82, 1.0, 0.98], rim: [0.14, 0.82, 0.86] },
+    blossom:   { bg: [0.034, 0.018, 0.026], base: [0.70, 0.26, 0.42], line: [1.0, 0.52, 0.66], sand: [1.0, 0.88, 0.94], rim: [1.0, 0.34, 0.52] },
+    cobalt:    { bg: [0.012, 0.018, 0.032], base: [0.24, 0.33, 0.48], line: [0.62, 0.82, 1.0], sand: [0.90, 0.95, 1.0], rim: [0.28, 0.58, 0.94] },
+    /* gunmetal: cold, desaturated steel — reads as metal, not as another blue */
+    gunmetal:  { bg: [0.018, 0.022, 0.028], base: [0.26, 0.30, 0.34], line: [0.74, 0.82, 0.92], sand: [0.92, 0.94, 0.96], rim: [0.52, 0.66, 0.82] },
+    /* abyss: near-black plate under a hot cyan line, for media where the plate
+     * fill glows and the figure needs a hue it does not share */
+    abyss:     { bg: [0.008, 0.016, 0.026], base: [0.06, 0.14, 0.22], line: [0.30, 0.98, 1.0], sand: [0.86, 0.98, 1.0], rim: [0.10, 0.80, 0.95] }
   };
-  var PALETTE_IDS = ["champagne", "ion", "copper", "verdigris", "ice", "mono"];
+  var PALETTE_IDS = ["champagne", "ion", "copper", "verdigris", "ice", "mono",
+    "ember", "magma", "orchid", "ultraviolet", "toxic", "candy",
+    "aurora", "solar", "neon", "blood", "lagoon", "blossom", "cobalt", "gunmetal", "abyss"];
+  var DUST_HOT = new Float32Array([1.0, 0.97, 0.90]);
 
   var VS_PLATE = `#version 300 es
 layout(location=0) in vec2 aUV;
@@ -137,6 +159,65 @@ void main() {
   float body = 0.10 + 0.25 * vG;
   vec3 col = uRim * (body + rim * 0.55 + hi * 0.9 * (0.4 + vG));
   frag = vec4(col, (0.35 + 0.6 * rim + 0.5 * hi) * (0.45 + 0.55 * vG));
+}`;
+
+  /* Airborne dust: a soft additive bokeh sprite. The shader reads the same
+   * height + envelope textures as the plate, so a grain rides the surface and
+   * lights up as it crosses a nodal line (the "sparkle" of the source system,
+   * kept because crossing a node is exactly where a real dust grain would
+   * touch down and be thrown again). */
+  var VS_DUST = `#version 300 es
+layout(location=0) in vec2 aUV;
+layout(location=1) in float aZ;
+layout(location=2) in float aLife;
+layout(location=3) in float aSize;
+uniform mat4 uMVP;
+uniform sampler2D uHeight;
+uniform sampler2D uEnv;
+uniform float uAmp, uPx, uSizeScale;
+out float vLife;
+out float vSpark;
+out float vFade;
+void main() {
+  float h = texture(uHeight, aUV).r;
+  vec3 p = vec3((aUV.x * 2.0 - 1.0) * 0.92, aZ + h * uAmp + 0.035, (aUV.y * 2.0 - 1.0) * 0.92);
+  gl_Position = uMVP * vec4(p, 1.0);
+  float e = texture(uEnv, aUV).r;
+  vSpark = 1.0 - smoothstep(0.0, 0.06, e);
+  vLife = aLife;
+  /* Depth cue: a grain high off the plate is nearer the lens and further out of
+   * focus, so it draws bigger and dimmer - that gradient is what makes the
+   * layer read as volume instead of screen-space speckle. */
+  float depth = clamp(aZ / 1.4, 0.0, 1.0);
+  float defocus = mix(0.36, 2.2, depth);
+  /* fade at the rim so the footprint never reads as a hard rectangle, and fade
+   * in/out over the life so nothing pops */
+  float rr = length(p.xz);
+  vFade = (1.0 - smoothstep(0.80, 1.06, rr))
+        * smoothstep(0.0, 0.10, aLife) * (1.0 - smoothstep(0.70, 1.0, aLife))
+        * mix(1.0, 0.62, depth);
+  float grow = 0.6 + 0.4 * smoothstep(0.0, 0.20, aLife);
+  gl_PointSize = clamp(aSize * uSizeScale * defocus * uPx * grow / max(0.15, gl_Position.w), 2.0, 74.0);
+}`;
+
+  var FS_DUST = `#version 300 es
+precision highp float;
+in float vLife;
+in float vSpark;
+in float vFade;
+uniform vec3 uIn, uOut, uHot;
+uniform float uOpacity, uHalo;
+out vec4 frag;
+void main() {
+  vec2 d = gl_PointCoord - 0.5;
+  float r = length(d) * 2.0;
+  /* bokeh: a wide soft halo (scaled per medium) over a small core, nothing clipped */
+  float halo = smoothstep(1.0, 0.10, r) * 0.55 * uHalo;
+  float core = 1.0 - smoothstep(0.04, 0.34, r);
+  if (halo <= 0.004 && core <= 0.004) discard;
+  vec3 col = mix(uIn, uOut, vLife);
+  col = mix(col, uHot, vSpark * 0.6);
+  frag = vec4(col * (0.42 + core * 1.05 + vSpark * 0.7), (halo * 0.75 + core) * uOpacity * vFade);
 }`;
 
   var VS_BG = `#version 300 es
@@ -265,8 +346,9 @@ void main() {
     var pPlate = program(gl, VS_PLATE, FS_PLATE);
     var pSand = program(gl, VS_SAND, FS_SAND);
     var pBub = program(gl, VS_BUB, FS_BUB);
+    var pDust = program(gl, VS_DUST, FS_DUST);
     var pBg = program(gl, VS_BG, FS_BG);
-    if (!pPlate || !pSand || !pBub || !pBg) return null;
+    if (!pPlate || !pSand || !pBub || !pDust || !pBg) return null;
 
     var m = mesh(gl, 150);
     var texH = makeTex(gl, 256), texE = makeTex(gl, 256);
@@ -289,6 +371,16 @@ void main() {
     gl.vertexAttribDivisor(1, 1);
     gl.bindVertexArray(null);
 
+    /* dust: u, v, z, life, size (5 floats) */
+    var dustVAO = gl.createVertexArray(), dustVBO = gl.createBuffer();
+    gl.bindVertexArray(dustVAO);
+    gl.bindBuffer(gl.ARRAY_BUFFER, dustVBO);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 20, 0);
+    gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 20, 8);
+    gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 20, 12);
+    gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 20, 16);
+    gl.bindVertexArray(null);
+
     var quadVAO = gl.createVertexArray(), quadVBO = gl.createBuffer();
     gl.bindVertexArray(quadVAO);
     gl.bindBuffer(gl.ARRAY_BUFFER, quadVBO);
@@ -297,6 +389,7 @@ void main() {
     gl.bindVertexArray(null);
 
     var sandData = new Float32Array(24000 * 3), bubData = new Float32Array(4000 * 4);
+    var dustData = new Float32Array(6000 * 5);
     var U = new Map();
     function loc(p, name) {
       var m = U.get(p);
@@ -391,6 +484,45 @@ void main() {
           gl.drawArrays(gl.POINTS, 0, n);
         }
 
+        /* airborne dust — additive bokeh, depth-tested so the far plate hides it */
+        if (st.dust && st.dust.n && st.showDust !== false) {
+          var du = st.dust, k3, o3 = 0, n3 = Math.min(du.n, 6000);
+          for (k3 = 0; k3 < n3; k3++) {
+            dustData[o3++] = du.x[k3] * 0.5 + 0.5;
+            dustData[o3++] = du.y[k3] * 0.5 + 0.5;
+            dustData[o3++] = du.z[k3];
+            dustData[o3++] = du.life[k3];
+            dustData[o3++] = du.size[k3] * 1.7;
+          }
+          gl.useProgram(pDust);
+          gl.uniformMatrix4fv(loc(pDust, "uMVP"), false, MVP);
+          gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texH);
+          gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, texE);
+          gl.uniform1i(loc(pDust, "uHeight"), 0);
+          gl.uniform1i(loc(pDust, "uEnv"), 1);
+          gl.uniform1f(loc(pDust, "uAmp"), st.amp);
+          gl.uniform1f(loc(pDust, "uPx"), canvas.width * 0.0135);
+          gl.uniform1f(loc(pDust, "uSizeScale"), st.dustSize === undefined ? 1 : st.dustSize);
+          gl.uniform1f(loc(pDust, "uHalo"), st.dustHalo === undefined ? 1 : st.dustHalo);
+          gl.uniform1f(loc(pDust, "uOpacity"), st.dustOpacity === undefined ? 0.42 : st.dustOpacity);
+          gl.uniform3fv(loc(pDust, "uIn"), pal.rim);
+          gl.uniform3fv(loc(pDust, "uOut"), pal.sand);
+          gl.uniform3fv(loc(pDust, "uHot"), DUST_HOT);
+          gl.enable(gl.DEPTH_TEST);
+          gl.depthMask(false);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+          gl.bindVertexArray(dustVAO);
+          gl.bindBuffer(gl.ARRAY_BUFFER, dustVBO);
+          gl.bufferData(gl.ARRAY_BUFFER, dustData.subarray(0, n3 * 5), gl.DYNAMIC_DRAW);
+          gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 20, 0);
+          gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 1, gl.FLOAT, false, 20, 8);
+          gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 20, 12);
+          gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 20, 16);
+          gl.drawArrays(gl.POINTS, 0, n3);
+          gl.depthMask(true);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+
         /* bubbles */
         if (st.bubbles && st.bubbles.n && st.showBubbles !== false) {
           var b = st.bubbles, k2, o2 = 0, n2 = Math.min(b.n, 4000);
@@ -483,6 +615,19 @@ void main() {
             var sz = 0.7 + sd.size[q] * 1.1;
             ctx.fillRect(p2[0], p2[1], sz, sz);
           }
+        }
+        /* dust: a sparse translucent overlay; the 2D path cannot depth-sort, so
+         * grains are simply drawn on top at low alpha (Android fallback) */
+        if (st.dust && st.dust.n && st.showDust !== false) {
+          var dd = st.dust, m3 = Math.min(dd.n, 1200);
+          ctx.fillStyle = "rgb(" + pal.sand.map(function (x) { return Math.round(x * 255); }).join(",") + ")";
+          for (q = 0; q < m3; q++) {
+            var pd = map(dd.x[q], dd.y[q]);
+            ctx.globalAlpha = 0.10 + 0.32 * Math.sin(Math.PI * dd.life[q]) * (0.4 + 0.6 * dd.z[q]);
+            var s3 = 0.8 + dd.size[q] * 1.2;
+            ctx.fillRect(pd[0], pd[1], s3, s3);
+          }
+          ctx.globalAlpha = 1;
         }
       }
     };

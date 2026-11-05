@@ -43,6 +43,8 @@
   var VM = globalThis.GnauralVizMath;
   var VP = globalThis.GnauralVizPal;
   var MODES = globalThis.GnauralVizModes;
+  var CP = globalThis.GnauralVizPresets ||
+    { LIST: [], byId: function () { return null; }, step: function () { return null; }, random: function () { return null; } };
   if (!VM || !MODES || !VP) {
     console.warn("[viz] kernel missing (vizmath/vizpal/vizmodes) — visualizers not started");
     return;
@@ -60,7 +62,7 @@
   function defaults() {
     return {
       v: 1, on: true, backdrop: "tide", overlays: ["pulse"], palette: "auto",
-      intensity: 0.7, calm: 1, auto: false, seed: (Math.random() * 0xFFFFFFFF) >>> 0
+      intensity: 0.7, calm: 1, auto: false, seed: (Math.random() * 0xFFFFFFFF) >>> 0, preset: ""
     };
   }
   function loadPrefs() {
@@ -84,6 +86,7 @@
           if (typeof d.calm === "number") p.calm = clamp01(d.calm);
           if (typeof d.auto === "boolean") p.auto = d.auto;
           if (typeof d.seed === "number") p.seed = d.seed >>> 0;
+          if (typeof d.preset === "string") p.preset = d.preset;
         }
       } else if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         p.on = false;                 /* WCAG 2.3.3: honour the preference first run */
@@ -192,6 +195,14 @@
         "  <span class=\"readout\" id=\"vizSync\">&mdash;</span>" +
         "</div>" +
         "<div class=\"sep\"></div>" +
+        "<div class=\"row between\"><span class=\"readout\">Scene</span><span class=\"hint\" style=\"margin:0\">one pick</span></div>" +
+        "<div class=\"vz-scenes\">" +
+        "  <button id=\"vizPrev\" title=\"previous scene\">&lsaquo;</button>" +
+        "  <select id=\"vizPreset\"></select>" +
+        "  <button id=\"vizNext\" title=\"next scene\">&rsaquo;</button>" +
+        "  <button id=\"vizShuffle\" class=\"ghost\" title=\"random scene\">shuffle</button>" +
+        "</div>" +
+        "<p class=\"hint\" id=\"vizSceneNote\" style=\"margin:6px 0 0\"></p>" +
         "<div class=\"row between\"><span class=\"readout\">Backdrop</span><span class=\"hint\" style=\"margin:0\">one at a time</span></div>" +
         "<div class=\"chips\" id=\"vizBackdrops\"></div>" +
         "<div class=\"row between\"><span class=\"readout\">Overlays</span><span class=\"hint\" style=\"margin:0\">toggle any</span></div>" +
@@ -240,8 +251,23 @@
         els.chips.pl[pid] = pc;
         pc.onclick = (function (x) { return function () { setPalette(x); }; })(pid);
       }
-      els.sliders.intensity = card.querySelector("#vizIntensity");
-      els.sliders.calm = card.querySelector("#vizCalm");
+      /* scene picker: one pick sets backdrop + overlays + palette + sliders */
+      var vsel = card.querySelector("#vizPreset");
+      if (vsel) {
+        for (i = 0; i < CP.LIST.length; i++) {
+          var vop = document.createElement("option");
+          vop.value = CP.LIST[i].id; vop.textContent = CP.LIST[i].name;
+          vsel.appendChild(vop);
+        }
+        vsel.onchange = function () { applyPreset(this.value); };
+        var vprev = card.querySelector("#vizPrev");
+        var vnext = card.querySelector("#vizNext");
+        var vsh = card.querySelector("#vizShuffle");
+        if (vprev) vprev.onclick = function () { stepPreset(-1); };
+        if (vnext) vnext.onclick = function () { stepPreset(1); };
+        if (vsh) vsh.onclick = function () { var s = CP.random(prefs.preset); if (s) applyPreset(s.id); };
+      }
+      els.sliders.intensity = card.querySelector("#vizIntensity");      els.sliders.calm = card.querySelector("#vizCalm");
       els.sliders.auto = card.querySelector("#vizAuto");
       els.pill = card.querySelector("#vizPill");
       els.sync = card.querySelector("#vizSync");
@@ -282,6 +308,13 @@
     for (var id in els.chips.bd) els.chips.bd[id].classList.toggle("on", prefs.backdrop === id);
     for (var oid in els.chips.ov) els.chips.ov[oid].classList.toggle("on", prefs.overlays.indexOf(oid) >= 0);
     for (var pid in els.chips.pl) els.chips.pl[pid].classList.toggle("on", prefs.palette === pid);
+    var vsel = els.card.querySelector("#vizPreset");
+    if (vsel && vsel.value !== prefs.preset) vsel.value = prefs.preset;
+    var vnote = els.card.querySelector("#vizSceneNote");
+    if (vnote) {
+      var vsc = CP.byId(prefs.preset);
+      vnote.textContent = vsc ? vsc.blurb : "Custom — chips below set it by hand.";
+    }
     if (els.sliders.intensity) els.sliders.intensity.value = Math.round(prefs.intensity * 100);
     if (els.sliders.calm) els.sliders.calm.value = Math.round(prefs.calm * 100);
     if (els.sliders.auto) els.sliders.auto.checked = !!prefs.auto;
@@ -853,22 +886,53 @@
   function setBackdrop(id) {
     if (MODES.BACKDROPS.indexOf(id) < 0) return;
     prefs.backdrop = id;
+    if (!applying) prefs.preset = "";
     savePrefs(); rebuildScenes(); refreshCard();
   }
   function setOverlays(ids) {
     var out = [];
     for (var i = 0; i < ids.length && i < 4; i++) if (MODES.OVERLAYS.indexOf(ids[i]) >= 0 && out.indexOf(ids[i]) < 0) out.push(ids[i]);
     prefs.overlays = out;
+    if (!applying) prefs.preset = "";
     savePrefs(); rebuildScenes(); refreshCard();
   }
   function toggleOverlay(id) {
     var at = prefs.overlays.indexOf(id);
     if (at >= 0) { prefs.overlays.splice(at, 1); }
     else { if (prefs.overlays.length >= 4) prefs.overlays.shift(); prefs.overlays.push(id); }
+    prefs.preset = "";
     savePrefs(); rebuildScenes(); refreshCard();
   }
   function setPalette(id) {
-    for (var i = 0; i < VP.PALETTES.length; i++) if (VP.PALETTES[i].id === id) { prefs.palette = id; savePrefs(); rebuildScenes(); refreshCard(); return; }
+    for (var i = 0; i < VP.PALETTES.length; i++) if (VP.PALETTES[i].id === id) {
+      prefs.palette = id;
+      if (!applying) prefs.preset = "";
+      savePrefs(); rebuildScenes(); refreshCard(); return;
+    }
+  }
+
+  /* A scene is one pick: backdrop, overlays, palette and both sliders. Manual
+   * chip clicks clear the scene id (it is a custom look from then on). */
+  var applying = false;
+  function applyPreset(id) {
+    var s = CP.byId(id);
+    if (!s) return false;
+    applying = true;
+    setBackdrop(s.backdrop);
+    setOverlays(s.overlays || []);
+    setPalette(s.palette);
+    prefs.intensity = clamp01(s.intensity);
+    prefs.calm = clamp01(s.calm);
+    applying = false;
+    prefs.preset = s.id;
+    savePrefs(); rebuildScenes(); refreshCard();
+    if (els.sliders.intensity) els.sliders.intensity.value = Math.round(prefs.intensity * 100);
+    if (els.sliders.calm) els.sliders.calm.value = Math.round((60 + (prefs.calm - 0.6) * 100) * 1);
+    return true;
+  }
+  function stepPreset(dir) {
+    var s = CP.step(prefs.preset, dir);
+    if (s) applyPreset(s.id);
   }
 
   /* ---- scramble: pool curation + constrained draw (design rules R1-R13) -- */
@@ -1042,6 +1106,8 @@
     setBackdrop: setBackdrop,
     setOverlays: setOverlays,
     toggleOverlay: toggleOverlay,
+    applyPreset: applyPreset,
+    presets: function () { return CP.LIST.map(function (s) { return s.id; }); },
     setPalette: setPalette,
     scramble: scramble,
     debugState: debugState,

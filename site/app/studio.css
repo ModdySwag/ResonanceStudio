@@ -123,6 +123,22 @@ main.grid { display: grid; grid-template-columns: 330px minmax(0, 1fr) 400px; ga
 
 /* ------------------------------------------------------------ browser */
 #search { width: 100%; }
+.vz-scenes { display: grid; grid-template-columns: 26px 1fr 26px; gap: 6px; align-items: center; }
+.vz-scenes select {
+  background: rgba(38,29,21,.8); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 7px; padding: 6px 7px; font-size: .78rem; min-width: 0;
+}
+.vz-scenes button {
+  background: rgba(38,29,21,.65); border: 1px solid var(--line); color: var(--ink-dim);
+  border-radius: 7px; padding: 6px 0; font-size: .9rem; line-height: 1; cursor: pointer;
+}
+.vz-scenes button:hover { border-color: var(--acc); color: var(--ink); }
+#vizShuffle {
+  grid-column: 1 / -1; font-size: .68rem; letter-spacing: .09em; text-transform: uppercase;
+  padding: 5px 0; color: var(--ink-faint);
+}
+#vizShuffle:hover { color: var(--acc2); }
+
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 8px; }
 .chip {
   font-size: .82rem; padding: 4px 10px; border-radius: 999px;

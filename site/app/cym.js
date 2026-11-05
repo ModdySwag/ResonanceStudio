@@ -30,7 +30,7 @@
     var d = {
       v: 1, medium: "plate", material: "steel", size: 300, thickness: 1, q: 90,
       palette: "champagne", sand: true, lines: true, bubbles: true, src: "session",
-      hz: 220, drive: 0.75, speed: 0.5, freeze: false, sandN: 9000
+      hz: 220, drive: 0.75, speed: 0.5, freeze: false, sandN: 9000, dust: true, dustN: 0, preset: "cold-forge"
     };
     try {
       var raw = localStorage.getItem(KEY);
@@ -39,10 +39,11 @@
     return d;
   }
   var P = store();
+  var CP = globalThis.GnauralCymPresets || { LIST: [], byId: function () { return null; }, step: function () { return null; }, random: function () { return null; } };
   function save() { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {} }
 
   var root = null, canvas = null, renderer = null, field = null, medium = null;
-  var sand = null, bubbles = null, opened = false, raf = 0;
+  var sand = null, bubbles = null, dust = null, opened = false, raf = 0;
   var cam = { yaw: 0.52, pitch: 0.66, dist: 3.30 };
   var t = 0, lastT = 0, lastFieldT = 0, phase = 0, fps = 60, frames = 0, fpsT = 0;
   var audioState = { f0: 0, rate: 0, drive: 0, playing: false, label: "", n: 0 };
@@ -228,6 +229,13 @@
       var drive = Math.max(0.04, a.drive);
       sand.step(field, dt, drive, { strength: 7 + 9 * drive, damp: 0.14 + 0.1 * (1 - drive), jitter: 0.5 });
     }
+    /* dust: water sprays and falls hard, bubbles float, plates just breathe */
+    if (P.dust && dust && !P.freeze) {
+      var ddrive = Math.max(0.04, a.drive);
+      var dopt = P.medium === "water" ? { grav: 1.10, drag: 0.42, lift: 2.2, launch: 0.95 }
+        : (P.medium === "bubbles" ? { grav: -0.30, drag: 0.90, lift: 0.9, launch: 0.05 } : { grav: 0.30, drag: 0.85 });
+      dust.step(field, dt, ddrive, dopt);
+    }
     if (P.medium === "bubbles" && P.bubbles) {
       bubbles.step(field, dt, a.f0 || 220, Math.max(0.1, a.drive), { trap: 2.0, rise: 0.08 });
     }
@@ -240,6 +248,10 @@
       lineW: P.medium === "water" ? 0.010 : 0.016, glow: P.medium === "water" ? 0.35 : 0.55,
       water: P.medium === "water", circle: medium.geometry === "circle",
       showBubbles: P.bubbles, sand: P.sand ? sand : null, bubbles: P.medium === "bubbles" ? bubbles : null,
+      dust: P.dust ? dust : null, showDust: P.dust,
+      dustSize: P.medium === "water" ? 0.55 : (P.medium === "bubbles" ? 1.55 : 1.0),
+      dustHalo: P.medium === "water" ? 0.35 : (P.medium === "bubbles" ? 1.25 : 1.0),
+      dustOpacity: 0.09 + 0.11 * Math.max(0.15, a.drive),
       medium: medium.geometry, phase: phase, re: field.re, im: field.im
     });
 
@@ -416,6 +428,12 @@
     /* left rail */
     var left = el("aside", "cym-panel cym-left", root);
     left.innerHTML =
+      "<div class='cym-sec'><h4>Scenes</h4>" +
+      "<div class='cym-scenes'><button id='cymPrev' title='previous scene'>‹</button>" +
+      "<select id='cymPreset'></select>" +
+      "<button id='cymNext' title='next scene'>›</button>" +
+      "<button id='cymShuffle' title='random scene'>shuffle</button></div>" +
+      "<p class='cym-note' id='cymSceneNote'></p></div>" +
       "<div class='cym-sec'><h4>Medium</h4><div class='cym-btns' id='cymMedia'>" +
       "<button data-m='plate'>Free plate</button>" +
       "<button data-m='bolted'>Bolted plate</button>" +
@@ -443,6 +461,7 @@
       "<label class='cym-check'><input id='cymSand' type='checkbox'> Sand grains</label>" +
       "<label class='cym-check'><input id='cymLines' type='checkbox'> Nodal glow</label>" +
       "<label class='cym-check'><input id='cymBub' type='checkbox'> Bubbles</label>" +
+      "<label class='cym-check'><input id='cymDust' type='checkbox'> Airborne dust</label>" +
       "<label class='cym-check'><input id='cymFreeze' type='checkbox'> Freeze motion</label>" +
       "</div>" +
       "<div class='cym-sec'><h4>Actions</h4>" +
@@ -468,6 +487,11 @@
     wire();
     renderer = R.create(canvas);
     sand = new F.Sand(P.sandN || 6000);
+    /* dust is atmosphere, not geometry: a phone gets a third of a desktop's
+     * grains (fill rate is the only real cost - additive sprites at depth) */
+    var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    var dustN = P.dustN || ((coarse || Math.min(window.innerWidth, window.innerHeight) < 620) ? 1200 : 2500);
+    dust = new F.Dust(dustN);
     bubbles = new F.Bubbles(900);
     buildMedium();
     syncControls();
@@ -506,9 +530,10 @@
     $("cymSand").onchange = function () { P.sand = this.checked; save(); };
     $("cymLines").onchange = function () { P.lines = this.checked; save(); };
     $("cymBub").onchange = function () { P.bubbles = this.checked; save(); };
+    $("cymDust").onchange = function () { P.dust = this.checked; save(); };
     $("cymFreeze").onchange = function () { P.freeze = this.checked; save(); };
     $("cymReset").onclick = resetCam;
-    $("cymScatter").onclick = function () { sand.reset(); bubbles.reset(); toast("scattered"); };
+    $("cymScatter").onclick = function () { sand.reset(); bubbles.reset(); if (dust) dust.reset(field); toast("scattered"); };
     $("cymPng").onclick = savePng;
 
     var pal = $("cymPal");
@@ -518,6 +543,17 @@
       c.setAttribute("data-id", id); c.setAttribute("role", "button"); c.tabIndex = 0;
       c.onclick = (function (x) { return function () { P.palette = x; save(); syncControls(); }; })(id);
     }
+
+    var sel = $("cymPreset");
+    for (i = 0; i < CP.LIST.length; i++) {
+      var op = document.createElement("option");
+      op.value = CP.LIST[i].id; op.textContent = CP.LIST[i].name;
+      sel.appendChild(op);
+    }
+    sel.onchange = function () { applyScene(this.value); };
+    $("cymPrev").onclick = function () { stepScene(-1); };
+    $("cymNext").onclick = function () { stepScene(1); };
+    $("cymShuffle").onclick = function () { var s = CP.random(P.preset); if (s) applyScene(s.id); };
 
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
@@ -541,6 +577,9 @@
       else if (ev.key === "c" || ev.key === "C") { P.sand = !P.sand; save(); syncControls(); }
       else if (ev.key === "l" || ev.key === "L") { P.lines = !P.lines; save(); syncControls(); }
       else if (ev.key === "f" || ev.key === "F") { P.freeze = !P.freeze; save(); syncControls(); }
+      else if (ev.key === "n" || ev.key === "N") { stepScene(1); }
+      else if (ev.key === "p" || ev.key === "P") { stepScene(-1); }
+      else if (ev.key === "r" || ev.key === "R") { var rs = CP.random(P.preset); if (rs) applyScene(rs.id); }
     });
   }
 
@@ -595,6 +634,35 @@
   function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
   function resetCam() { cam = { yaw: 0.52, pitch: 0.66, dist: 3.30 }; }
 
+  /* A scene is one atomic state: medium, plate, tone, look, camera. The stored
+   * mode INDEX resolves to that mode's own frequency, so every scene lands on a
+   * genuine resonance instead of a near-miss of a hard-coded Hz. */
+  function applyScene(id, silent) {
+    var s = CP.byId(id);
+    if (!s) return false;
+    P.preset = s.id;
+    P.medium = s.medium; P.material = s.material; P.size = s.size;
+    P.thickness = s.thickness; P.q = s.q; P.palette = s.palette;
+    P.drive = s.drive; P.speed = s.speed;
+    P.sand = !!s.sand; P.lines = !!s.lines; P.bubbles = !!s.bubbles; P.dust = !!s.dust;
+    P.src = "manual";
+    if (s.hz) P.hz = s.hz;
+    cam.yaw = s.cam.yaw; cam.pitch = s.cam.pitch; cam.dist = s.cam.dist;
+    buildMedium();
+    if (!s.hz && medium && medium.modes.length) {
+      var m = medium.modes[Math.min(s.mode, medium.modes.length - 1)];
+      if (m && isFinite(m.f) && m.f > 20) P.hz = m.f;
+    }
+    dirtyField = true;
+    save(); syncControls();
+    if (!silent) toast(s.name);
+    return true;
+  }
+  function stepScene(dir) {
+    var s = CP.step(P.preset, dir);
+    if (s) applyScene(s.id);
+  }
+
   /* ==================================================================== *
    * controls sync
    * ==================================================================== */
@@ -614,9 +682,14 @@
     $("cymSand").checked = !!P.sand;
     $("cymLines").checked = !!P.lines;
     $("cymBub").checked = !!P.bubbles;
+    $("cymDust").checked = !!P.dust;
     $("cymFreeze").checked = !!P.freeze;
     var pal = $("cymPal").querySelectorAll(".cym-chip");
     for (i = 0; i < pal.length; i++) pal[i].classList.toggle("on", pal[i].getAttribute("data-id") === P.palette);
+    var sd = $("cymPreset");
+    if (sd && sd.value !== P.preset) sd.value = P.preset;
+    var sn = $("cymSceneNote");
+    if (sn) { var sc = CP.byId(P.preset); sn.textContent = sc ? sc.blurb : ""; }
     var note = $("cymMediumNote");
     if (note) {
       note.textContent = {
@@ -741,7 +814,8 @@
       nearestF: medium ? (medium.modes[ana.nearest] || {}).f : null,
       firstModes: medium ? medium.modes.slice(0, 3).map(function (m) { return [m.label, Math.round(m.f * 10) / 10]; }) : null,
       tone: audioState.label, partials: audioState.partials ? audioState.partials.length : 0,
-      bubbles: bubbles ? bubbles.n : 0, sandN: sand ? sand.n : 0
+      bubbles: bubbles ? bubbles.n : 0, sandN: sand ? sand.n : 0, dustN: dust ? dust.n : 0, dust: !!P.dust,
+      preset: P.preset
     };
   }
 
@@ -754,7 +828,10 @@
       save(); if (o.medium || o.material || o.size || o.thickness) buildMedium();
       syncControls(); dirtyField = true;
     },
-    getPrefs: function () { return JSON.parse(JSON.stringify(P)); }
+    getPrefs: function () { return JSON.parse(JSON.stringify(P)); },
+    dustState: function () { return dust; },
+    scene: function (id) { return applyScene(id, true); },
+    scenes: function () { return CP.LIST.map(function (s) { return s.id; }); }
   };
 
   function boot() {
@@ -765,4 +842,5 @@
   else setTimeout(boot, 0);
 
   window.ResonanceCymatics = { version: 1, api: api, open: open, close: close, toggle: toggle, debugState: debugState };
+  try { Object.defineProperty(window.ResonanceCymatics, "__dust", { get: function () { return dust; } }); } catch (e) { /* unbuilt */ }
 })();
