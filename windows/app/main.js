@@ -57,7 +57,11 @@ function resolveRequestPath(urlPath) {
   let rel;
   try { rel = decodeURIComponent(urlPath.split('?')[0].split('#')[0]); }
   catch (e) { return null; }
-  if (rel === '/' || rel === '') rel = '/app/index.html';
+  /* "/" is the marketing landing page, exactly as it is on the site. Serving the studio here
+   * instead left every one of the app's relative refs resolving against the root (a dead page at
+   * that URL, with the marketing URL in the address bar); now the landing's own script bounces a
+   * shell window on to /app/ before it paints, and a browser keeps the landing. */
+  if (rel === '/' || rel === '') rel = '/index.html';
   if (!rel.startsWith('/')) return null;
   const abs = path.normalize(path.join(ROOT, rel));
   if (abs !== ROOT && !abs.startsWith(ROOT + path.sep)) return null;

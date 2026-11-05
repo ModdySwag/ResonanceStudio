@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Desktop shell only: the wordmark must not walk out to the marketing page (which redirects
+     back anyway), so it points at this directory. Browsers keep "../" and the landing page. -->
+<script>(function () {
+  if (!window.RS_SHELL) return;
+  var fix = function () {
+    var a = document.querySelector('.brand a[href]');
+    if (a) a.setAttribute('href', './');
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fix); else fix();
+})();</script>
 <title>Resonance Studio — Gnaural Web</title>
 <meta name="description" content="Resonance Studio in the browser: binaural beats, monaural beats, isochronic pulses, noise beds, 100+ ready sessions, a full schedule editor. All on this site.">
 <link rel="canonical" href="https://moddys.net/resonance/app/">
@@ -208,7 +218,8 @@
       the upstream project, the Monroe Institute or any other programme. Upstream presets are not bundled (their
       archive states no licence); the built-in library is original to this site.
       <a href="../credits/">Credits &amp; licence</a> · <a href="../help/evidence.html">Evidence</a> ·
-      <a href="../help/">Help</a> · <a href="NOTICE.txt">NOTICE.txt</a> · <a href="https://moddys.net/">moddys.net</a></p>
+      <a href="../help/">Help</a> · <a href="NOTICE.txt">NOTICE.txt</a> ·
+      <a href="https://moddys.net/resonance/">web version</a> · <a href="https://moddys.net/">moddys.net</a></p>
     </details>
   </footer>
 </div>

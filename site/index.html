@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Desktop shell only: the marketing page is not the product, so land on the studio instead.
+     window.RS_SHELL comes from the Electron preload; in a browser it is undefined and the
+     landing stays exactly as it is. ?shell=0 keeps the landing even in the shell (QA, or a
+     deliberate look at this page) — the app's "web version" link is the usual route. -->
+<script>if (window.RS_SHELL && !/[?&]shell=0/.test(location.search)) location.replace('app/');</script>
 <title>Resonance Studio — binaural beats, tones & noise in browser</title>
 <meta name="description" content="Resonance Studio: binaural pairs, monaural beats, isochronic pulses, three noise colours, a schedule editor and a session library in the browser. No accounts.">
 <link rel="canonical" href="https://moddys.net/resonance/">

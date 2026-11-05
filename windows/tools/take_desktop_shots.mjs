@@ -129,6 +129,24 @@ try {
   await sleep(2500);
   await shot('desktop-06-manual');
 
+  // 07 — the Cymatic Chamber, reached by its own #cymatics route (dust ON, done slowly
+  // enough to show airborne grains: the toggle is the app's own control)
+  await ev(`location.href = '/app/'`);
+  await sleep(2600);
+  await ev(`location.hash = '#cymatics'`);
+  for (let i = 0; i < 40; i++) {
+    const st = await ev(`(() => { try { return !!(window.ResonanceCymatics && window.ResonanceCymatics.api && window.ResonanceCymatics.debugState().open); } catch (e) { return false; } })()`);
+    if (st === true) break;
+    await sleep(500);
+  }
+  const dustPref = await ev(`(() => { try { return window.ResonanceCymatics.api.getPrefs().dust; } catch (e) { return false; } })()`);
+  if (dustPref !== true) { await ev(`document.getElementById('cymDust').click()`); await sleep(700); }
+  await ev(`window.ResonanceCymatics.api.scene('faraday-storm')`);
+  await sleep(4000);
+  await shot('desktop-07-chamber');
+  console.log('chamber:', JSON.stringify(await ev(`(() => { const d = window.ResonanceCymatics.debugState();
+    return { scenes: window.ResonanceCymatics.api.scenes().length, dust: d.dust, dustN: d.dustN }; })()`)));
+
   console.log('--- shell tail ---');
   console.log(out.split(/\r?\n/).filter(Boolean).slice(-4).join('\n'));
 } catch (e) {

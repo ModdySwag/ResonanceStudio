@@ -86,16 +86,26 @@ def main():
 
     # ---------------------------------------------------------------- clean slate
     print("-- pre-flight")
+    # A running copy (an earlier install's [Run] entry, or a stray from a failed run) makes Inno's
+    # RestartManager give up under /SUPPRESSMSGBOXES and abort with exit code 5 — close it first,
+    # before the uninstaller, which has the same problem.
+    run(["taskkill", "/F", "/IM", "ResonanceStudio.exe"], timeout=60)
+    time.sleep(1)
     if os.path.exists(UNINST):
         run([UNINST, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"])
         time.sleep(4)
     check(not os.path.exists(EXE), "no previous install in the way", INSTALL_DIR)
+    tl = run(["tasklist", "/FI", "IMAGENAME eq ResonanceStudio.exe"], timeout=60)
+    check("ResonanceStudio.exe" not in (tl.stdout or ""), "no running copy holds the install files")
 
     # ---------------------------------------------------------------- install
     print("\n-- install (silent, per-user, default location)")
+    # /CURRENTUSER pins the mode: from an ELEVATED shell Inno would otherwise pick /ALLUSERS and
+    # put the app in Program Files, which the per-user assertions below and the uninstaller path
+    # do not describe.
     data_dir_before = sorted(os.listdir(DATA_DIR)) if os.path.isdir(DATA_DIR) else []
     t0 = time.time()
-    r = run([SETUP, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"])
+    r = run([SETUP, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CURRENTUSER"])
     check(r.returncode == 0, "the installer exits 0", f"{time.time() - t0:.1f}s")
     check(os.path.exists(EXE), "ResonanceStudio.exe is installed", EXE)
     check(os.path.exists(UNINST), "the uninstaller is installed")
@@ -141,7 +151,7 @@ def main():
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(marker, "w", encoding="utf-8") as f:
         f.write("user work that must survive an upgrade\n")
-    r = run([SETUP, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART"])
+    r = run([SETUP, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CURRENTUSER"])
     check(r.returncode == 0, "the upgrade install exits 0")
     check(os.path.exists(EXE), "the app is still installed after the upgrade")
     check(os.path.exists(marker), "user data (%APPDATA%\\ResonanceStudio) survived the upgrade", marker)

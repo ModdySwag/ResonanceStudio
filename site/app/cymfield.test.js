@@ -145,5 +145,80 @@ function close(a, b, tol) { return Math.abs(a - b) <= tol; }
   check("resonance glow stays in [0,1]", glowOk);
 }
 
+/* ---------- 6. airborne dust ---------- */
+{
+  const med = { kind: "water", geometry: "square", modes: [
+    { i: 0, kx: Math.PI, ky: 0, phase: 0, f: 100, kind: "water" }
+  ] };
+  const f = new F.Field(med, 128);
+  f.setWeights(new Float64Array([1]), new Float64Array([0]));
+  const dust = new F.Dust(400, 11);
+  function meanEnvAtGrains() {
+    let s = 0;
+    for (let i = 0; i < dust.n; i++) s += f.envAt(dust.x[i], dust.y[i]);
+    return s / dust.n;
+  }
+  const before = meanEnvAtGrains();
+  for (let k = 0; k < 1200; k++) dust.step(f, 1 / 60, 0.85, { grav: 0.42, drag: 1.55 });
+  const after = meanEnvAtGrains();
+  /* airborne dust is advected, not deposited: it biases towards the nodes but
+   * never converges on them the way the sand does (that is the settle test) */
+  check("dust drifts off the antinodes towards the nodal set (" + before.toFixed(3) + " -> " + after.toFixed(3) + ")",
+    after < before * 0.90, after.toFixed(3));
+
+  let inside = true, zOk = true, lifeOk = true;
+  for (let i = 0; i < dust.n; i++) {
+    if (!(dust.x[i] >= -F.DUST_MAP.rim && dust.x[i] <= F.DUST_MAP.rim &&
+          dust.y[i] >= -F.DUST_MAP.rim && dust.y[i] <= F.DUST_MAP.rim)) inside = false;
+    if (!(dust.z[i] >= 0 && dust.z[i] <= dust.maxY + 1e-6)) zOk = false;
+    if (!(dust.life[i] >= 0 && dust.life[i] < 1.0001)) lifeOk = false;
+  }
+  check("dust stays inside the rim margin and under the ceiling", inside && zOk);
+  check("dust life stays in [0,1) so every grain recycles", lifeOk);
+  check("the population count is preserved", dust.n === 400, dust.n);
+
+  /* spawn really is biased to the loud parts of the plate */
+  const probe = new F.Dust(600, 5);
+  probe.reset(f);
+  let spawnEnv = 0, planeEnv = 0, mp = 0;
+  for (let i = 0; i < probe.n; i++) {
+    spawnEnv += f.envAt(probe.x[i], probe.y[i]);
+    for (let u = 0; u < 4; u++) { planeEnv += f.envAt(Math.random() * 2 - 1, Math.random() * 2 - 1); mp++; }
+  }
+  check("grain emitters are biased to antinodes (spawn " + (spawnEnv / probe.n).toFixed(2) +
+    " vs plane " + (planeEnv / mp).toFixed(2) + ")", spawnEnv / probe.n > planeEnv / mp * 1.15);
+
+  /* gravity flips for the two media; the window is short and life pinned to 0
+   * so nothing respawns and only the force is measured */
+  const up = new F.Dust(300, 9), down = new F.Dust(300, 9);
+  for (let i = 0; i < up.n; i++) { up.z[i] = 0.3; down.z[i] = 0.3; up.life[i] = 0; down.life[i] = 0; }
+  for (let k = 0; k < 90; k++) {
+    up.step(f, 1 / 60, 0.5, { grav: F.DUST_MAP.gravBubbles, drag: 1.30 });
+    down.step(f, 1 / 60, 0.5, { grav: F.DUST_MAP.gravWater, drag: 0.55 });
+  }
+  let zu = 0, zd = 0, vzUp = 0;
+  for (let i = 0; i < up.n; i++) { zu += up.z[i]; zd += down.z[i]; vzUp += up.vz[i]; }
+  check("bubbles float up and water droplets fall (" + (zu / up.n).toFixed(2) + " vs " + (zd / down.n).toFixed(2) + ")",
+    zu / up.n > 0.5 && vzUp / up.n > 0 && zd / down.n < 0.25);
+
+  /* a quiet plate lets grains settle */
+  const sett = new F.Dust(300, 13);
+  for (let k = 0; k < 1500; k++) sett.step(f, 1 / 60, 0.02, { grav: 0.42, drag: 1.55 });
+  let settled = 0;
+  for (let i = 0; i < sett.n; i++) if (sett.set[i] > F.DUST_MAP.setAt) settled++;
+  check("a quiet plate settles a real fraction of the grains", settled / sett.n > 0.4, settled + "/" + sett.n);
+
+  /* the disc footprint holds */
+  const dice = { kind: "plate", geometry: "circle", modes: med.modes };
+  const fc = new F.Field(dice, 96);
+  fc.setWeights(new Float64Array([1]), new Float64Array([0]));
+  const dc = new F.Dust(300, 17);
+  for (let k = 0; k < 900; k++) dc.step(fc, 1 / 60, 0.9, { grav: 0.3 });
+  let inDisc = true;
+  for (let i = 0; i < dc.n; i++) if (Math.hypot(dc.x[i], dc.y[i]) > F.DUST_MAP.rim + 1e-6) inDisc = false;
+  check("disc medium keeps every grain inside the rim margin",
+    inDisc && Math.max.apply(null, Array.from(dc.x, (v) => Math.abs(v))) <= F.DUST_MAP.rim + 1e-6, "rim " + F.DUST_MAP.rim);
+}
+
 console.log("\n" + pass + " passed, " + fail + " failed");
 process.exit(fail ? 1 : 0);

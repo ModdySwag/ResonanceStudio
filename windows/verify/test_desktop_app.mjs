@@ -184,6 +184,7 @@ try {
   const g = await app.ev(`(() => ({
     url: location.href, secure: window.isSecureContext, ready: document.readyState,
     title: document.title, marker: window.__RS_DESKTOP || null, shareBase: window.RS_SHARE_BASE || null,
+    shellFlag: window.RS_SHELL === true,
     worklet: typeof AudioWorkletNode !== 'undefined' && typeof AudioContext !== 'undefined',
     presets: window.__gnauralAPI.presetCount(),
     rows: document.querySelectorAll('#plist .item').length,
@@ -371,13 +372,49 @@ try {
     }
   }
 
+  // The wordmark used to walk out to the marketing page, which is not the product: in the shell
+  // the studio must stay put, and the landing — if reached at all — must come back on its own.
+  console.log('\n-- the wordmark & the landing stay inside the studio');
+  check(g && g.shellFlag === true, 'the preload exposes window.RS_SHELL', String(g && g.shellFlag));
+  const brand = await app.ev(`(() => { const a = document.querySelector('.brand a[href]'); return a ? a.getAttribute('href') : null; })()`);
+  check(brand === './', 'the wordmark is retargeted to this directory (not "../")', String(brand));
+  const webVer = await app.ev(`(() => { const a = [...document.querySelectorAll('footer a')].find(x => /^web version$/i.test(x.textContent.trim())); return a ? a.getAttribute('href') : null; })()`);
+  check(webVer === 'https://moddys.net/resonance/', 'the app chrome still offers the web version, absolutely linked', String(webVer));
+
+  await app.ev(`(() => { const a = document.querySelector('.brand a[href]'); a.click(); return true; })()`);
+  await sleep(1800);
+  const nav = await app.ev(`({ url: location.href, path: location.pathname, chrome: !!document.getElementById('play') && !!document.querySelector('#plist .item'), title: document.title })`);
+  check(nav && nav.path === '/app/', 'clicking the wordmark keeps the window inside /app/', nav && nav.url);
+  check(nav && nav.chrome === true, 'the studio chrome survives the wordmark click', nav && `play/list ${nav.chrome}`);
+
+  // control: the same document with ?shell=0 must stay on the landing, so the redirect is the
+  // flag's doing and not some URL quirk (browsers, with no flag at all, always stay).
+  await app.ev(`location.assign('/?shell=0')`);
+  await sleep(2500);
+  const stayed = await app.ev(`({ path: location.pathname, shell: window.RS_SHELL, title: document.title })`);
+  check(stayed && stayed.path === '/' && /binaural beats, tones/.test(stayed.title || ''),
+        'with ?shell=0 the landing really renders and stays put', stayed && `${stayed.path} · RS_SHELL=${stayed.shell}`);
+
+  const goLanding = async (url) => {
+    await app.ev(`location.assign(${JSON.stringify(url)})`);
+    await app.waitFor(`/\\/app\\/$/.test(location.pathname) && !!document.getElementById('play')`, { timeoutMs: 30000 });
+    return app.ev(`({ url: location.href, path: location.pathname, title: document.title })`);
+  };
+  const landed = await goLanding('/');
+  check(landed && landed.path === '/app/', 'loading the landing in the shell redirects to the studio', landed && landed.url);
+  check(landed && !/binaural beats, tones/.test(landed.title || ''), 'the window title is the studio’s, not the landing’s', landed && landed.title);
+  const landed2 = await goLanding('/index.html');
+  check(landed2 && landed2.path === '/app/', 'the landing by its own file name redirects too', landed2 && landed2.url);
+  await app.waitFor(`document.querySelectorAll('#plist .item').length > 20 && !!document.getElementById('play')`, { timeoutMs: 60000, label: 're-boot' });
+
   console.log('\n-- the bundled pages serve');
   const packs = await fi(`http://127.0.0.1:${ONLINE_PORT}/packs/`);
   check(packs.status === 200 && packs.text.includes('classic.zip'), 'the packs page serves with its zip links', `HTTP ${packs.status}`);
   const help = await fi(`http://127.0.0.1:${ONLINE_PORT}/help/`);
   check(help.status === 200 && /manual|guide|Gnaural/i.test(help.text), 'the manual serves', `HTTP ${help.status}`);
   const land = await fi(`http://127.0.0.1:${ONLINE_PORT}/`);
-  check(land.status === 200 && land.text.length > 1000, 'the site landing page serves', `HTTP ${land.status}, ${land.text.length} B`);
+  check(land.status === 200 && land.text.includes('binaural') && land.text.length > 1000,
+        'the site landing page serves at /', `HTTP ${land.status}, ${land.text.length} B`);
   const zipHead = await fi(`http://127.0.0.1:${ONLINE_PORT}/app/pack/gnaural-web-complete.zip`, { method: 'HEAD' });
   check(zipHead.status === 200, 'the complete-archive zip serves', `HTTP ${zipHead.status}`);
 

@@ -8,6 +8,10 @@
  *  RS_SHARE_BASE  the live-site base for "Copy share link" — a 127.0.0.1 URL would be useless
  *                 to paste anywhere, so the link is built against moddys.net exactly as the
  *                 browser version builds it against its own origin.
+ *  RS_SHELL       the short boolean form of the same fact: pages read it to keep in-app
+ *                 navigation inside the studio (the landing redirects to app/, the wordmark
+ *                 stops pointing at "/") while browsers, where it is undefined, keep the
+ *                 site's normal links.
  */
 'use strict';
 
@@ -25,3 +29,6 @@ contextBridge.exposeInMainWorld('__RS_DESKTOP', {
 });
 
 contextBridge.exposeInMainWorld('RS_SHARE_BASE', 'https://moddys.net/resonance/app/');
+
+/* A stable, documented flag, so no page has to sniff __RS_DESKTOP or the origin. */
+contextBridge.exposeInMainWorld('RS_SHELL', true);
