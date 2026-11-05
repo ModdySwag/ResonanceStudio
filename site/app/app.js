@@ -359,11 +359,15 @@
     var row = document.createElement("div");
     row.className = "erow";
     row.appendChild(cell(String(rowIndex), "idx"));
-    [["duration", e.duration], ["basefreq", e.basefreq_start], ["beat", e.beatfreq_start_HALF * 2],
-     ["volL", e.volL_start], ["volR", e.volR_start]].forEach(function (field) {
+    /* the header cells above the grid are the only visible names for these
+     * boxes, so each one carries the row number and its column as the name */
+    [["duration", e.duration, "dur s"], ["basefreq", e.basefreq_start, "base Hz"],
+     ["beat", e.beatfreq_start_HALF * 2, "beat Hz"], ["volL", e.volL_start, "vol L"],
+     ["volR", e.volR_start, "vol R"]].forEach(function (field) {
       var wrap = document.createElement("span");
       var inp = document.createElement("input");
       inp.type = "number"; inp.step = "any"; inp.value = round6(field[1]);
+      inp.setAttribute("aria-label", "entry " + rowIndex + " " + field[2]);
       inp.onchange = function () { applyEntryEdit(state.selected, rowIndex, field[0], parseFloat(inp.value)); };
       wrap.appendChild(inp);
       row.appendChild(wrap);

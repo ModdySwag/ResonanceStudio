@@ -7,7 +7,7 @@
 :root {
   --bg: #0e0b09; --bg2: #16110d; --panel: #1b1510; --panel2: #241c15;
   --line: #3a2c20; --line2: #5a452c;
-  --ink: #f2e6d8; --ink-dim: #b9a48c; --ink-faint: #7d6a58;
+  --ink: #f2e6d8; --ink-dim: #b9a48c; --ink-faint: #97846d;
   --acc: #e0b96f; --acc2: #f2ddb0; --acc-ink: #2a1a08;   /* champagne gold */
   --good: #93c793; --bad: #e0604f; --info: #82b3d8;
   --radius: 10px; --shadow: 0 10px 30px rgba(0,0,0,.45);
@@ -24,8 +24,8 @@ html[data-skin="nocturne"] {
 html[data-skin="paper"] {
   --bg: #f6f2ea; --bg2: #efe8dc; --panel: #fffdf8; --panel2: #f3ece0;
   --line: #d9cdb9; --line2: #b9a98f;
-  --ink: #2b2419; --ink-dim: #5f5342; --ink-faint: #8a7c66;
-  --acc: #b4610f; --acc2: #8a4a0b; --acc-ink: #fff8ef;
+  --ink: #2b2419; --ink-dim: #5f5342; --ink-faint: #726450;
+  --acc: #a4570c; --acc2: #8a4a0b; --acc-ink: #fff8ef;
   --good: #3f7a3f; --bad: #a8341f; --info: #2f6187;
   --shadow: 0 8px 22px rgba(90,70,40,.16);
 }
@@ -160,7 +160,10 @@ main.grid { display: grid; grid-template-columns: 330px minmax(0, 1fr) 400px; ga
 #plist .item .nm { flex: 1; min-width: 0; }
 #plist .item .nm b { display: block; font-weight: 600; }
 #plist .item .nm span { color: var(--ink-faint); font-size: .82rem; }
-#plist .star { background: none; border: none; padding: 0 2px; font-size: 1rem; color: var(--ink-faint); }
+#plist .star { background: none; border: none; padding: 0 2px; font-size: 1rem; color: var(--ink-faint);
+  min-width: 24px; min-height: 24px; display: inline-flex; align-items: center; justify-content: center; }
+/* WCAG 2.2 2.5.8: every small control keeps a 24 x 24 hit area */
+a.btn, button.ghost, select, input[type="checkbox"], input[type="radio"] { min-height: 24px; }
 #plist .star.on { color: var(--acc); }
 .presetsel { display: flex; gap: 8px; align-items: center; }
 #presets { flex: 1; min-width: 0; }

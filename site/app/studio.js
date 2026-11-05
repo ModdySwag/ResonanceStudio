@@ -112,9 +112,12 @@
         list.appendChild(el("div", "grp", it.packName));
       }
       var row = el("div", "item" + (it.name === S.title ? " sel" : ""));
-      row.setAttribute("role", "option");
+      /* a list, not a listbox: every row is its own tab stop and the favourite
+       * star is a real button inside it, which a listbox option may not contain.
+       * aria-current marks the loaded session (listitem has no aria-selected). */
+      row.setAttribute("role", "listitem");
       row.setAttribute("tabindex", "0");
-      row.setAttribute("aria-selected", it.name === S.title ? "true" : "false");
+      if (it.name === S.title) row.setAttribute("aria-current", "true");
       var star = el("button", "star" + (isFav(it.name) ? " on" : ""), isFav(it.name) ? "★" : "☆");
       star.type = "button";
       star.title = "favourite";

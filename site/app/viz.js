@@ -198,7 +198,7 @@
         "<div class=\"row between\"><span class=\"readout\">Scene</span><span class=\"hint\" style=\"margin:0\">one pick</span></div>" +
         "<div class=\"vz-scenes\">" +
         "  <button id=\"vizPrev\" title=\"previous scene\">&lsaquo;</button>" +
-        "  <select id=\"vizPreset\"></select>" +
+        "  <select id=\"vizPreset\" aria-label=\"visualizer scene\"></select>" +
         "  <button id=\"vizNext\" title=\"next scene\">&rsaquo;</button>" +
         "  <button id=\"vizShuffle\" class=\"ghost\" title=\"random scene\">shuffle</button>" +
         "</div>" +

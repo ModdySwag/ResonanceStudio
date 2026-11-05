@@ -6,9 +6,9 @@
 <title>Resonance Studio — Gnaural Web</title>
 <meta name="description" content="Resonance Studio in the browser: binaural beats, monaural beats, isochronic pulses, noise beds, 100+ ready sessions, a full schedule editor. All on this site.">
 <link rel="canonical" href="https://moddys.net/resonance/app/">
-<link rel="stylesheet" href="studio.css?v=82y">
+<link rel="stylesheet" href="studio.css?v=82z">
 <link rel="stylesheet" href="cym.css?v=1c">
-<link rel="stylesheet" href="../site.css?v=83x">
+<link rel="stylesheet" href="../site.css?v=83y">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNicgZmlsbD0nIzE2MTQwZicvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTYnIHI9JzcnIGZpbGw9JyNlMGI5NmYnLz48L3N2Zz4=">
 </head>
 <body>
@@ -16,6 +16,7 @@
 <header class="studio">
   <div class="bar">
     <div class="brand">
+      <h1 class="sr">Resonance Studio</h1>
       <a href="../"><span class="mark">Resonance Studio</span></a>
       <span class="sub">Gnaural Web</span>
     </div>
@@ -52,6 +53,7 @@
 
 <div class="wrap">
   <main class="grid">
+    <h2 class="sr">Studio workspace</h2>
 
     <!-- ---------------------------------------------------- left column -->
     <div class="col left">
@@ -62,7 +64,7 @@
         <div class="presetsel">
           <select id="presets" aria-label="preset"></select>
         </div>
-        <div id="plist" role="listbox" aria-label="session list"></div>
+        <div id="plist" role="list" aria-label="session list"></div>
         <div class="row between" style="margin-top:8px">
           <button id="randomBtn" class="ghost" title="pick a session from the whole library">🎲 Surprise me</button>
           <span class="readout" id="count"></span>
@@ -217,14 +219,14 @@
 <script src="packs.js?v=81p"></script>
 <script src="rates.js?v=81p"></script>
 <script src="pack.js?v=81p"></script>
-<script src="app.js?v=81q"></script>
-<script src="studio.js?v=82y"></script>
+<script src="app.js?v=81r"></script>
+<script src="studio.js?v=83a"></script>
 <!-- visualizer system: mounts its own panels + menu card, follows the audio -->
 <script src="vizmath.js?v=82v"></script>
 <script src="vizpal.js?v=82v"></script>
 <script src="vizmodes.js?v=82x"></script>
 <script src="vizpresets.js?v=1a"></script>
-<script src="viz.js?v=82z"></script>
+<script src="viz.js?v=83b"></script>
 <!-- the dedicated cymatic chamber: physics -> field -> renderer -> UI -->
 <script src="cymatics.js?v=1b"></script>
 <script src="cymfield.js?v=1d"></script>
