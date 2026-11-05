@@ -1,7 +1,7 @@
 /* Gnaural Web — Resonance Studio: visualizer renderers (pure canvas2d, no DOM coupling).
  * Licensed GPL-2.0-or-later (see NOTICE.txt).
  *
- * THIRTEEN VISUALIZERS, one contract. Every mode draws from the SAME frame
+ * FOURTEEN VISUALIZERS, one contract. Every mode draws from the SAME frame
  * object F supplied by viz.js, which is built from the phase-exact mirrors in
  * vizmath.js (Cursor / GateMirror / EnvPhase / PhaseMirror) plus the measured
  * AnalyserNode features. The rendering rules follow the research briefs that
@@ -396,6 +396,253 @@
         ctx.lineWidth = lw;
         ctx.strokeStyle = ink(F, 0.45 + 0.25 * cu.hue, [0.05, 0.035, 0.025][pass] * (0.5 + F.pre.intensity));
         ctx.stroke();
+      }
+    }
+    ctx.restore();
+  };
+
+  /* --------------------------------------------------------- PhaseField *
+   * The Entrainment Body (route A of the phase-2 note): additive bokeh dust
+   * in two lobes, one per ear, thrown on each voice's OWN phase-exact gate.
+   * Mapping table: AUDIO-PARTICLE-CONCEPTS.md §1 — phase is displacement,
+   * loudness is opacity, timbre is size, luminance stays slow.
+   *
+   *   - emitters sit at +/-0.34 of the FIELD width with the f0 radius, so the
+   *     two lobes ARE the binaural pair (one per ear), not an analyser read;
+   *   - the throw is 0.9 + 2.6*sin(pi*gate.phase) sampled at spawn: the burst
+   *     is phase-exact and survives dropped frames;
+   *   - life 0..1 damps drift and alpha at the end (settle), never a pop;
+   *   - reduced motion: 300 static points, advected only on a gate edge;
+   *   - sprites are one pre-rendered 24 px radial gradient per palette slot,
+   *     drawn with 'lighter'; alpha is quantised to 8 steps (turbo clamp).
+   *                                                                         */
+  var PF_SPRITE = 24;
+  var PF_NARROW_W = 1000;                       /* field px: below = tier C  */
+  var PF_POOL_NARROW = 900, PF_POOL_WIDE = 1600, PF_POOL_REDUCED = 300;
+  var PF_TONES = [0.22, 0.42, 0.62, 0.82];
+  var PF_REDUCED = null;
+
+  function pfReduced(F) {
+    if (F && (F.reduced === true || (F.pre && F.pre.reduced === true))) return true;
+    if (PF_REDUCED === null) {
+      try { PF_REDUCED = !!(typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches); }
+      catch (e) { PF_REDUCED = false; }
+    }
+    return PF_REDUCED;
+  }
+  function pfFollow(cur, target, dt, tau) {
+    return cur + (target - cur) * (1 - Math.exp(-dt / Math.max(1e-3, tau)));
+  }
+  /* centroid (Hz) -> 0..1 in log space: the colourIn tertile */
+  function pfCentroid(feat) {
+    var c = feat.centroidSlow || feat.centroid || 300;
+    return clamp(Math.log(Math.max(40, c) / 40) / Math.log(80), 0, 1);
+  }
+  function pfVisRate(F) {
+    var v = pulseVoice(F);
+    var r = v ? (v.kind === "binaural" ? v.env.visRate : v.gate.visRate) : 0.2;
+    return clamp(r || 0.2, 0.1, 2.2);
+  }
+
+  function PhaseField(seed) {
+    this.id = "phasefield";
+    this.r = VP.mulberry32(seed);
+    this.sprites = null;
+    this.skey = "";
+    this.buckets = [];
+    this.s = {
+      pool: 0, parts: [], seen: {}, alt: 0, prewarm: 0,
+      emit: 0, decay: 0.35, turb: 0, turbT: 0.10, size: 1, opac: 0.34,
+      tint: 0.55, sa: 0
+    };
+  }
+  PhaseField.prototype.reset = function () {
+    this.s.parts.length = 0; this.s.seen = {}; this.s.prewarm = 0; this.s.emit = 0;
+  };
+  PhaseField.prototype.ensureSprites = function (F) {
+    if (typeof document === "undefined" || !document.createElement) return null;
+    var key = F.pal ? (F.pal.id || "p") : "fallback";
+    if (this.sprites && this.skey === key) return this.sprites;
+    var out = [], i;
+    for (i = 0; i < PF_TONES.length; i++) {
+      var c = mkLayer(PF_SPRITE, PF_SPRITE);
+      if (!c) return null;
+      var c2 = c.getContext("2d"), h = PF_SPRITE / 2;
+      var gra = c2.createRadialGradient(h, h, 0, h, h, h);
+      gra.addColorStop(0, ink(F, PF_TONES[i], 0.80));
+      gra.addColorStop(0.34, ink(F, PF_TONES[i], 0.30));
+      gra.addColorStop(0.70, ink(F, PF_TONES[i], 0.08));
+      gra.addColorStop(1, ink(F, PF_TONES[i], 0));
+      c2.fillStyle = gra;
+      c2.fillRect(0, 0, PF_SPRITE, PF_SPRITE);
+      out.push(c);
+    }
+    this.sprites = out; this.skey = key;
+    return out;
+  };
+  /* one particle at the emitter of `side` (+1 right ear, -1 left) */
+  PhaseField.prototype.mkP = function (F, v, side, phase, str) {
+    var r = this.r, H = F.H;
+    var fw = F.field ? F.field.W : F.W;
+    var base = (v && v.base) || 220;
+    var radF = 0.6 + clamp(base, 30, 600) / 200 * 0.9;      /* f0 -> radius    */
+    var rad = radF * H * 0.045;
+    var ex = fw * (0.5 + side * 0.34);
+    var ey = H * 0.56;
+    var thr = (0.9 + 2.6 * Math.sin(Math.PI * clamp(phase, 0, 1))) * (0.30 + 0.12 * str);
+    var fl = clamp(0.55 * ((F.feat && F.feat.flux) || 0), 0, 0.35);   /* 0-0.35 */
+    var ang = r() * TAU, rr = Math.sqrt(r()) * rad;
+    return {
+      x: ex + Math.cos(ang) * rr,
+      y: ey + Math.sin(ang) * rr * 0.55,
+      vx: (r() - 0.5) * fl * H * 1.6 + side * r() * H * 0.02,
+      vy: -thr * H * 0.09 - r() * H * 0.02,
+      life: 0,
+      ttl: clamp((1.2 + r() * 1.2) / pfVisRate(F), 0.9, 4.5),
+      z: 0.2 + r() * 0.8,
+      tone: r(),
+      sp: 0
+    };
+  };
+  PhaseField.prototype.step = function (F) {
+    var s = this.s, dt = clamp(F.dt || 1 / 60, 0, 0.1);
+    var fw = F.field ? F.field.W : F.W, H = F.H;
+    var feat = F.feat || {};
+    var band = (feat.bandsAtt && feat.bandsAtt.carrier) || 0;
+    var calm = (F.pre && F.pre.calm) ? F.pre.calm : 1;
+    var red = pfReduced(F);
+    var vr = pfVisRate(F);
+    var i, v;
+
+    s.pool = red ? PF_POOL_REDUCED : (fw < PF_NARROW_W ? PF_POOL_NARROW : PF_POOL_WIDE);
+    s.emit = pfFollow(s.emit, 0, dt, 0.22);                /* release tau 0.22 */
+    s.decay = pfFollow(s.decay, 0.35 + 0.08 * vr, dt, 0.5);
+    s.turbT = pfFollow(s.turbT, 0.10 + 0.04 * vr, dt, 1.0);
+    s.size = pfFollow(s.size, clamp(0.9 + 1.4 * band, 0.8, 2.6), dt, 0.4);
+    s.opac = pfFollow(s.opac, Math.min(0.5, 0.34 + 0.22 * (feat.rmsSlow || 0)), dt, 1.2);
+    s.tint = pfFollow(s.tint, pfCentroid(feat), dt, 1.6);
+    s.turb = red ? 0 : pfFollow(s.turb, 0.42 * (feat.rmsAtt || 0) * (1 / calm), dt, 0.5);
+    if (s.sa > 0) s.sa = Math.max(0, s.sa - dt);
+
+    /* gate opening edges: iso openings / binaural envelope wraps */
+    var edges = 0;
+    for (i = 0; i < F.voices.length; i++) {
+      v = F.voices[i];
+      var ev = (v.kind === "binaural") ? ((v.env && v.env.wraps) || 0) : ((v.gate && v.gate.openings) || 0);
+      var was = (s.seen[v.i] === undefined) ? ev : s.seen[v.i];
+      if (ev > was) {
+        var dn = Math.min(4, ev - was);
+        edges += dn;
+        s.emit = 6;                                       /* attack 0.04 s   */
+        var ph0 = (v.gate && v.gate.phase) || 0;
+        for (var b = 0; b < dn; b++) {
+          var sd = (v.kind === "binaural") ? ((b % 2) ? 1 : -1) : (((s.alt++) % 2) ? 1 : -1);
+          this.emit(F, v, sd, 22, ph0, s.emit, true);
+        }
+      }
+      s.seen[v.i] = ev;
+    }
+
+    /* population top-up (prewarm, resize, and the settle refill) */
+    if (s.parts.length < s.pool) {
+      var want = Math.min(s.pool - s.parts.length, Math.ceil((s.pool - s.parts.length) * Math.min(1, 5 * dt)) + 1);
+      var src = pulseVoice(F) || F.voices[0] || null;
+      for (i = 0; i < want; i++) {
+        s.parts.push(this.mkP(F, src, ((s.alt++) % 2) ? 1 : -1,
+          (src && src.gate && src.gate.phase) || 0.5, s.emit));
+      }
+    }
+
+    /* reduced motion: integrate one fixed step per gate edge only */
+    var stepDt = dt;
+    if (red) {
+      if (s.prewarm < 2) s.prewarm++;
+      else if (edges === 0) return;
+      stepDt = 0.16;
+    }
+
+    var tq = F.t * s.turbT, sc = 0.010;
+    var g = -0.55 * (feat.sync === null ? 1.35 : 1) * H * 0.10;
+    if (red) g *= 0.5;
+    for (i = s.parts.length - 1; i >= 0; i--) {
+      var p = s.parts[i];
+      p.life += stepDt / p.ttl;
+      if (p.life >= 1 || p.x < -60 || p.x > fw + 60 || p.y < -80 || p.y > H + 60) {
+        var rv = pulseVoice(F) || F.voices[0] || null;
+        s.parts[i] = this.mkP(F, rv, ((s.alt++) % 2) ? 1 : -1,
+          (rv && rv.gate && rv.gate.phase) || 0.5, s.emit);
+        continue;
+      }
+      var settle = p.life > 0.70 ? (p.life - 0.70) / 0.30 : 0;
+      var ax = 0, ay = g;
+      if (s.turb > 0) {
+        var nx = p.x * sc, ny = p.y * sc;
+        ax += (VP.fbm2(nx, ny, tq, 2) - 0.5) * 2 * s.turb * H;
+        ay += (VP.fbm2(nx + 37.7, ny + 11.3, tq, 2) - 0.5) * 1.2 * s.turb * H;
+      }
+      var damp = Math.exp(-(s.decay + settle * 2.6) * stepDt);
+      p.vx = (p.vx + ax * stepDt) * damp;
+      p.vy = (p.vy + ay * stepDt) * damp;
+      p.x += p.vx * stepDt;
+      p.y += p.vy * stepDt;
+    }
+  };
+  PhaseField.prototype.emit = function (F, v, side, n, phase, str, hot) {
+    var s = this.s, i;
+    for (i = 0; i < n && s.parts.length < s.pool; i++) {
+      var p = this.mkP(F, v, side, phase, str);
+      if (hot && this.r() < 0.25) p.sp = 1;
+      s.parts.push(p);
+    }
+    if (hot && F.feat) s.sa = Math.min(0.5, 0.55 * clamp(F.feat.flux || 0, 0, 1));
+  };
+  PhaseField.prototype.draw = function (F) {
+    var s = this.s, ctx = F.ctx, H = F.H;
+    var fw = F.field ? F.field.W : F.W;
+    var inten = (F.pre && F.pre.intensity) || 0.7;
+    ctx.save();
+    /* the opaque dark field first: additive only reads on a floor */
+    ctx.fillStyle = veil(F, clamp(0.58 + 0.22 * inten, 0, 1));
+    ctx.fillRect(0, 0, fw, H);
+    if (!s.parts.length) { ctx.restore(); return; }
+    var spr = this.ensureSprites(F);
+    var red = pfReduced(F);
+    var lum = 0.7 + 3.0 * (F.lum || 0);
+    var B = this.buckets, k, j, p, a, sz, ti;
+    for (k = 0; k < 9; k++) if (B[k]) B[k].length = 0;
+    /* alpha quantised to 8 steps: the turbo clamp keeps luminance steps small */
+    for (j = 0; j < s.parts.length; j++) {
+      p = s.parts[j];
+      var fin = smoothstep(clamp(p.life * 5, 0, 1));
+      var fout = 1 - smoothstep(clamp((p.life - 0.70) / 0.30, 0, 1));
+      a = s.opac * (0.35 + 0.65 * p.z) * fin * fout * lum;
+      if (p.sp && s.sa > 0) a += s.sa * 0.55;
+      a = clamp(a, 0.012, 0.5);
+      k = clamp(Math.round(a * 16), 1, 8);
+      if (!B[k]) B[k] = [];
+      B[k].push(p);
+    }
+    ctx.globalCompositeOperation = "lighter";
+    for (k = 8; k >= 1; k--) {
+      var arr = B[k];
+      if (!arr || !arr.length) continue;
+      ctx.globalAlpha = k / 16;
+      for (j = 0; j < arr.length; j++) {
+        p = arr[j];
+        ti = clamp(Math.floor((s.tint + (p.tone - 0.5) * 0.30) * 3.999), 0, 3);
+        sz = clamp(5 + 13 * s.size * (0.55 + 0.75 * p.z) * (0.7 + 0.5 * (1 - p.life)) * (0.75 + 0.5 * inten), 2, 18);
+        if (spr && spr[ti]) ctx.drawImage(spr[ti], p.x - sz / 2, p.y - sz / 2, sz, sz);
+        else if (red) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, Math.max(1, sz * 0.22), 0, TAU);
+          ctx.fillStyle = ink(F, PF_TONES[ti], 1);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, sz * 0.5, 0, TAU);
+          ctx.fillStyle = ink(F, PF_TONES[ti], 0.55);
+          ctx.fill();
+        }
       }
     }
     ctx.restore();
@@ -822,6 +1069,7 @@
 
   var FACTORY = {
     tide: Tide, drift: Drift, rainfall: Rainfall, score: Score, aurora: Aurora,
+    phasefield: PhaseField,
     pulse: Pulse, phasors: Phasors, traces: Traces, orbits: Orbits,
     ripples: Ripples, harmonograph: Harmonograph, weave: Weave, meters: Meters
   };
@@ -832,6 +1080,7 @@
     rainfall:     { name: "Rainfall",     space: "panel", role: "backdrop" },
     score:        { name: "Score",        space: "panel", role: "backdrop" },
     aurora:       { name: "Aurora",       space: "field", role: "backdrop" },
+    phasefield:   { name: "Phase Field",  space: "field", role: "backdrop" },
     pulse:        { name: "Pulse",        space: "panel", role: "overlay" },
     phasors:      { name: "Phasors",      space: "panel", role: "overlay" },
     traces:       { name: "Traces",       space: "panel", role: "overlay" },
@@ -845,7 +1094,7 @@
   function mod1(x) { x = x % 1; return x < 0 ? x + 1 : x; }
 
   var api = {
-    BACKDROPS: ["off", "tide", "drift", "rainfall", "score", "aurora"],
+    BACKDROPS: ["off", "tide", "phasefield", "drift", "rainfall", "score", "aurora"],
     OVERLAYS: ["pulse", "phasors", "traces", "orbits", "ripples", "harmonograph", "weave", "meters"],
     META: META,
     create: function (id, seed) {
