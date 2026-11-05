@@ -290,13 +290,48 @@
   }
 
   /* --------------------------------------------------------------- panels */
+  /* a focused control inside one of the scroll boxes must never end up hidden
+   * behind the box's own edge — both boxes are keyboard-reachable */
+  function revealOnFocus(box) {
+    if (!box || box.getAttribute("data-reveal")) return;
+    box.setAttribute("data-reveal", "1");
+    box.addEventListener("focusin", function (ev) {
+      if (ev.target !== box && ev.target.scrollIntoView) {
+        ev.target.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+    });
+  }
+  function emptyLine(text) {
+    var d = document.createElement("div");
+    d.className = "emptylist"; d.textContent = text;
+    return d;
+  }
+
+  function selectVoice(i) { state.selected = i; renderVoiceList(); renderEntryEditor(); drawGraph(); }
+
   function renderVoiceList() {
     var box = $("voicelist");
+    var voices = state.engine ? state.engine.voices : [];
+    /* keep keyboard focus (and its row) across the rebuild */
+    var focused = box.contains(document.activeElement) ? document.activeElement : null;
+    var focusedIdx = focused ? Array.prototype.indexOf.call(box.querySelectorAll(".vrow"), focused.closest(".vrow")) : -1;
     box.innerHTML = "";
-    if (!state.engine) return;
-    state.engine.voices.forEach(function (v, i) {
+    revealOnFocus(box);
+    var cnt = $("voiceCount");
+    if (cnt) cnt.textContent = String(voices.length);
+    if (!state.engine) {
+      box.appendChild(emptyLine("No session loaded yet — pick one from the session browser, or add a voice below."));
+      return;
+    }
+    if (!voices.length) {
+      box.appendChild(emptyLine("No voices in this session — use “+ Add a voice”."));
+      return;
+    }
+    voices.forEach(function (v, i) {
       var row = document.createElement("div");
       row.className = "vrow" + (i === state.selected ? " sel" : "");
+      row.tabIndex = 0;
+      if (i === state.selected) row.setAttribute("aria-current", "true");
       var chip = document.createElement("span");
       chip.className = "chip"; chip.style.background = COLORS[i % COLORS.length];
       var name = document.createElement("span");
@@ -312,20 +347,42 @@
         rebuildEngine(); syncToWorklet();
       };
       row.appendChild(chip); row.appendChild(name); row.appendChild(mute);
-      row.onclick = function () { state.selected = i; renderVoiceList(); renderEntryEditor(); drawGraph(); };
+      row.onclick = function () { selectVoice(i); };
+      /* the row is not a button (it contains one), so wire the keys itself */
+      row.onkeydown = function (ev) {
+        if (ev.target !== row || (ev.key !== "Enter" && ev.key !== " ")) return;
+        ev.preventDefault();
+        selectVoice(i);
+      };
       box.appendChild(row);
     });
+    if (focusedIdx > -1) {
+      var rows = box.querySelectorAll(".vrow");
+      var again = rows[Math.min(focusedIdx, rows.length - 1)];
+      if (again) again.focus();
+    }
   }
 
   function renderEntryEditor() {
     var box = $("entryedit");
     box.innerHTML = "";
-    if (!state.engine || !state.engine.voices[state.selected]) return;
-    var v = state.engine.voices[state.selected];
+    revealOnFocus(box);
+    var v = state.engine && state.engine.voices[state.selected];
+    var ecnt = $("entryCount");
+    if (ecnt) ecnt.textContent = String(v ? v.entryCount : 0);
+    if (!v) {
+      box.appendChild(emptyLine("No entries — load a session or add a voice first."));
+      return;
+    }
     var cap = Math.min(v.entryCount, 400);
     var head = document.createElement("div");
     head.className = "ehead";
-    head.innerHTML = "<span>#</span><span>dur s</span><span>base Hz</span><span>beat Hz</span><span>vol L</span><span>vol R</span><span></span>";
+    head.innerHTML = "<span><abbr title=\"entry number\">#</abbr></span>" +
+      "<span><abbr title=\"duration in seconds\">dur s</abbr></span>" +
+      "<span><abbr title=\"starting carrier frequency in hertz\">base Hz</abbr></span>" +
+      "<span><abbr title=\"beat frequency in hertz\">beat Hz</abbr></span>" +
+      "<span><abbr title=\"starting volume, left channel\">vol L</abbr></span>" +
+      "<span><abbr title=\"starting volume, right channel\">vol R</abbr></span><span></span>";
     box.appendChild(head);
     var frag = document.createDocumentFragment();
     for (var j = 0; j < cap; j++) frag.appendChild(buildEntryRow(j, v));

@@ -618,15 +618,20 @@
     dlg.appendChild(sm);
     var b = el("div", "body");
     var kind = document.createElement("select");
+    kind.id = "addvoiceKind";
+    kind.setAttribute("aria-label", "what to add");
     [["iso", "Isochronic pulses (speaker-safe)"], ["binaural", "Binaural pair (headphones)"],
      ["tone", "Steady tone (mono)"], ["monaural", "Monaural beat (two tones, room air)"],
      ["pink", "Pink noise bed"], ["brown", "Brown noise bed"], ["white", "White noise bed"]]
       .forEach(function (o) { var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; kind.appendChild(op); });
     var rates = document.createElement("input"); rates.type = "number"; rates.value = "10"; rates.step = "0.01";
+    rates.id = "addvoiceRate";
     rates.setAttribute("aria-label", "rate in Hz");
     var carrier = document.createElement("input"); carrier.type = "number"; carrier.value = "300"; carrier.step = "1";
+    carrier.id = "addvoiceCarrier";
     carrier.setAttribute("aria-label", "carrier in Hz");
     var dur = document.createElement("input"); dur.type = "number"; dur.value = String(quickSeconds / 60); dur.step = "1";
+    dur.id = "addvoiceMinutes";
     dur.setAttribute("aria-label", "duration in minutes");
     var add = el("button", null, "Add layer"); add.type = "button";
     var g = el("div", "grid2");
@@ -641,6 +646,7 @@
     function labelled(text, node) {
       var w = document.createElement("div");
       var l = document.createElement("label"); l.className = "small"; l.textContent = text;
+      if (node.id) l.htmlFor = node.id;
       w.appendChild(l); w.appendChild(node);
       return w;
     }

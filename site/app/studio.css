@@ -217,9 +217,24 @@ html[data-skin="paper"] .pacer .dial span { color: #fff; }
 /* phase wheel */
 canvas#phase { width: 100%; height: 150px; display: block; background: var(--bg2); border: 1px solid var(--line); border-radius: 8px; }
 
-/* entries table (existing app.js markup) */
-#voicelist { max-height: 30vh; overflow: auto; }
-#entryedit { margin-top: 10px; }
+/* voices + entries — bounded scroll boxes (index.html sets tabindex/role).
+ * The column keeps one fixed height however many layers a schedule carries;
+ * the inset shadows and 1px inner edge tell the eye the box scrolls. */
+#voicelist, #entryedit {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg2) 45%, transparent);
+  box-shadow: inset 0 10px 10px -10px rgba(0,0,0,.6), inset 0 -10px 10px -10px rgba(0,0,0,.6);
+  scrollbar-width: thin;
+}
+#voicelist { max-height: 250px; padding: 4px; }
+#entryedit { max-height: 300px; margin-top: 8px; scroll-padding: 30px 0 8px; }
+#voicelist:focus-visible, #entryedit:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.cnt { font-family: var(--mono); letter-spacing: 0; color: var(--ink-faint); }
+.emptylist { padding: 10px 8px; color: var(--ink-faint); font-size: .84rem; }
 table { border-collapse: collapse; width: 100%; font-size: .84rem; }
 th, td { text-align: left; padding: 3px 6px; border-bottom: 1px solid var(--line); }
 th { color: var(--ink-faint); font-weight: 600; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; }
@@ -227,9 +242,33 @@ input.cell { width: 100%; padding: 3px 5px; font-family: var(--mono); font-size:
 .vrow { display: flex; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 7px; border: 1px solid transparent; cursor: pointer; }
 .vrow:hover { background: color-mix(in srgb, var(--acc) 8%, transparent); }
 .vrow.sel { background: color-mix(in srgb, var(--acc) 14%, transparent); border-color: var(--acc); }
+.vrow:focus-visible { outline: 2px solid var(--acc); outline-offset: -2px; }
 .vrow .dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
 .vrow .vname { flex: 1; min-width: 0; }
 .vrow button { padding: 2px 7px; font-size: .76rem; }
+
+/* entries grid — one row per entry, the column names ride along sticky */
+.ehead, .erow {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 24px;
+  gap: 4px; align-items: center;
+}
+.ehead {
+  position: sticky; top: 0; z-index: 2;
+  padding: 5px 6px 4px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--line2);
+  color: var(--ink-dim); font-size: .7rem; font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.ehead abbr { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
+.erow { padding: 3px 6px; border-top: 1px solid var(--line); }
+.erow .idx { font-family: var(--mono); font-size: .74rem; color: var(--ink-faint); }
+.erow input { width: 100%; min-width: 0; height: 26px; padding: 1px 3px; font-family: var(--mono); font-size: .76rem; }
+.erow input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.erow .mini { padding: 1px 4px; font-size: .74rem; }
+.etools .mini { padding: 3px 8px; font-size: .76rem; }
+.etools { padding: 5px 6px; border-top: 1px solid var(--line); background: var(--panel2); }
 
 /* downloads / packs */
 #pklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
@@ -415,3 +454,16 @@ header.studio .transport {
   position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
   opacity: 0; cursor: ns-resize; z-index: 2;
 }
+
+/* footer disclaimer: collapsed by default, quiet summary row */
+footer details.disc { margin-top: 4px; }
+footer details.disc > summary {
+  cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 24px; padding: 2px 8px; border: 1px solid var(--line2); border-radius: 999px;
+  font-size: .78rem; color: var(--ink-dim);
+}
+footer details.disc > summary::-webkit-details-marker { display: none; }
+footer details.disc > summary::before { content: "▸"; font-size: .7rem; }
+footer details.disc[open] > summary::before { content: "▾"; }
+footer details.disc > summary:hover { border-color: var(--acc); color: var(--ink); }
+footer details.disc > p:first-of-type { margin-top: 8px; }

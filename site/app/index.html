@@ -6,7 +6,7 @@
 <title>Resonance Studio — Gnaural Web</title>
 <meta name="description" content="Resonance Studio in the browser: binaural beats, monaural beats, isochronic pulses, noise beds, 100+ ready sessions, a full schedule editor. All on this site.">
 <link rel="canonical" href="https://moddys.net/resonance/app/">
-<link rel="stylesheet" href="studio.css?v=82z">
+<link rel="stylesheet" href="studio.css?v=83d">
 <link rel="stylesheet" href="cym.css?v=1c">
 <link rel="stylesheet" href="../site.css?v=83y">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMiAzMic+PHJlY3Qgd2lkdGg9JzMyJyBoZWlnaHQ9JzMyJyByeD0nNicgZmlsbD0nIzE2MTQwZicvPjxjaXJjbGUgY3g9JzE2JyBjeT0nMTYnIHI9JzcnIGZpbGw9JyNlMGI5NmYnLz48L3N2Zz4=">
@@ -167,16 +167,16 @@
       </section>
 
       <section class="card">
-        <h3>Voices — click to select</h3>
+        <h3 id="voicesHead">Voices — click to select · <span class="cnt" id="voiceCount" aria-live="polite">0</span></h3>
         <p class="hint">Entries ramp into the next entry's values and the last wraps to the first, so a level holds
           by repeating it.</p>
-        <div id="voicelist"></div>
+        <div id="voicelist" class="scrollbox" role="region" aria-labelledby="voicesHead" tabindex="0"></div>
         <div class="row" style="margin-top:8px">
           <button id="addvoiceBtn">+ Add a voice</button>
           <button id="delvoiceBtn" class="ghost" title="remove the selected voice">Remove voice</button>
         </div>
-        <h3 style="margin-top:12px">Entries</h3>
-        <div id="entryedit"></div>
+        <h3 id="entriesHead" style="margin-top:12px">Entries · <span class="cnt" id="entryCount" aria-live="polite">0</span></h3>
+        <div id="entryedit" class="scrollbox" role="region" aria-labelledby="entriesHead" tabindex="0"></div>
       </section>
 
       <section class="card">
@@ -192,6 +192,8 @@
   </main>
 
   <footer>
+    <details class="disc">
+    <summary>Disclaimer, licence &amp; credits</summary>
     <p><b>Use:</b> headphones for binaural beats — the beat is created in your hearing, not in the file; isochronic
       pulse presets and the whole Speakers pack work on loudspeakers, and nothing in that pack depends on a difference
       between your ears. <b>Care:</b> keep volumes moderate — a pulse train is more alerting than a steady tone at the
@@ -207,6 +209,7 @@
       archive states no licence); the built-in library is original to this site.
       <a href="../credits/">Credits &amp; licence</a> · <a href="../help/evidence.html">Evidence</a> ·
       <a href="../help/">Help</a> · <a href="NOTICE.txt">NOTICE.txt</a> · <a href="https://moddys.net/">moddys.net</a></p>
+    </details>
   </footer>
 </div>
 
@@ -220,7 +223,7 @@
 <script src="rates.js?v=81p"></script>
 <script src="pack.js?v=81p"></script>
 <script src="app.js?v=81r"></script>
-<script src="studio.js?v=83a"></script>
+<script src="studio.js?v=84a"></script>
 <!-- visualizer system: mounts its own panels + menu card, follows the audio -->
 <script src="vizmath.js?v=82v"></script>
 <script src="vizpal.js?v=82v"></script>
